@@ -24,7 +24,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
         }
 
-        public async Task ListenAsync(Func<IEnumerable<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {

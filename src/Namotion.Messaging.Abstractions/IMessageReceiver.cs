@@ -31,7 +31,7 @@ namespace Namotion.Messaging.Abstractions
         /// <param name="handleMessages">The message handler callback.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The task.</returns>
-        Task ListenAsync(Func<IEnumerable<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default);
+        Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Extends the message lock timeout on the given message.

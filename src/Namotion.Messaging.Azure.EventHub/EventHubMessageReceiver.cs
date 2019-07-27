@@ -41,7 +41,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
-        public async Task ListenAsync(Func<IEnumerable<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -87,13 +87,13 @@ namespace Namotion.Messaging.Azure.EventHub
 
         internal class EventProcessorFactory : IEventProcessorFactory
         {
-            private readonly Func<IEnumerable<Message>, CancellationToken, Task> _handleMessages;
+            private readonly Func<IReadOnlyCollection<Message>, CancellationToken, Task> _handleMessages;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
 
             public EventProcessorFactory(
-                Func<IEnumerable<Message>, CancellationToken, Task> handleMessages,
+                Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
@@ -115,14 +115,14 @@ namespace Namotion.Messaging.Azure.EventHub
             private const string SequenceNumberProperty = "x-opt-sequence-number";
             private const string OffsetProperty = "x-opt-offset";
 
-            private readonly Func<IEnumerable<Message>, CancellationToken, Task> _handleMessages;
+            private readonly Func<IReadOnlyCollection<Message>, CancellationToken, Task> _handleMessages;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
             private IDisposable _scope;
 
             public EventProcessor(
-                Func<IEnumerable<Message>, CancellationToken, Task> handleMessages,
+                Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
@@ -166,7 +166,7 @@ namespace Namotion.Messaging.Azure.EventHub
                         PartitionId = context.PartitionId,
                         Properties = m.Properties.ToDictionary(p => p.Key, p => p.Value),
                         SystemProperties = m.SystemProperties.ToDictionary(p => p.Key, p => p.Value)
-                    }), _cancellationToken);
+                    }).ToArray(), _cancellationToken);
 
                     _cancellationToken.ThrowIfCancellationRequested();
                     await context.CheckpointAsync();

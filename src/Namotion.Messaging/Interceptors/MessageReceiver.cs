@@ -15,7 +15,7 @@ namespace Namotion.Messaging.Interceptors
             _messageReceiver = messageReceiver;
         }
 
-        public Task ListenAsync(Func<IEnumerable<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             return _messageReceiver.ListenAsync(handleMessages, cancellationToken);
         }

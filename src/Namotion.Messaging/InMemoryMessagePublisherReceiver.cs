@@ -14,8 +14,8 @@ namespace Namotion.Messaging
         private readonly bool _awaitProcessing;
         private readonly List<Message> _deadLetterMessages = new List<Message>();
 
-        private Dictionary<Func<IEnumerable<Message>, CancellationToken, Task>, CancellationToken> funcs =
-            new Dictionary<Func<IEnumerable<Message>, CancellationToken, Task>, CancellationToken>();
+        private Dictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken> funcs =
+            new Dictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken>();
 
         public InMemoryMessagePublisherReceiver(bool awaitProcessing = false)
         {
@@ -30,7 +30,7 @@ namespace Namotion.Messaging
             lock (_lock)
             {
                 _count += messages.Count();
-                tasks = funcs.Select(f => Task.Run(() => f.Key(messages, f.Value)));
+                tasks = funcs.Select(f => Task.Run(() => f.Key(messages.ToArray(), f.Value)));
             }
 
             var task = Task.WhenAll(tasks)
@@ -48,7 +48,7 @@ namespace Namotion.Messaging
             }
         }
 
-        public async Task ListenAsync(Func<IEnumerable<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
