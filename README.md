@@ -37,7 +37,7 @@ Implementations:
 
 Dependencies: 
 
-- Microsoft.Azure.ServiceBus
+- [Microsoft.Azure.ServiceBus](https://www.nuget.org/packages/Microsoft.Azure.ServiceBus/)
 
 ### Namotion.Messaging.Azure.EventHub
 
@@ -48,7 +48,7 @@ Implementations:
 
 Dependencies: 
 
-- Microsoft.Azure.EventHubs.Processor
+- [Microsoft.Azure.EventHubs.Processor](https://www.nuget.org/packages/Microsoft.Azure.EventHubs.Processor/)
 
 ### Namotion.Messaging.RabbitMQ
 
@@ -59,9 +59,11 @@ Implementations:
 
 Dependencies: 
 
-- RabbitMQ.Client
+- [RabbitMQ.Client](https://www.nuget.org/packages/RabbitMQ.Client)
 
 ## Usage
+
+To use the `IMessageReceiver` in a simple command line application, implement the a new `BackgroundService` and start message processing in `ExecuteAsync`:
 
 ```CSharp
 public class MyBackgroundService : BackgroundService
@@ -78,7 +80,11 @@ public class MyBackgroundService : BackgroundService
         await _messageReceiver.ListenAsync(stoppingToken);
     }
 }
+```
 
+In your program's `Main` method, create a new `HostBuilder` and add the background service as a hosted service:
+
+```CSharp
 public static async Task Main(string[] args)
 {
     var host = new HostBuilder()
