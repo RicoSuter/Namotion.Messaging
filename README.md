@@ -1,10 +1,15 @@
 # Namotion.Messaging
 
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://rsuter.visualstudio.com/Namotion/_build?definitionId=19)
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
+
+This repository provides technology independent C# abstractions for message/event queues and data ingestion services to build multi-cloud capable applications and behavior driven integration testing and improved local development experiences.
+
 ## Packages
 
 **Namotion.Messaging.Abstractions**
 
-Contains the interfaces for working with various messaging implementations:
+Contains the messaging abstractions, mainly interfaces with a very small footprint and extremely stable contracts:
 
 - IMessagePublisher
 - IMessageReceiver
@@ -47,3 +52,35 @@ Implementations:
 Dependencies: 
 
 - RabbitMQ.Client
+
+## Usage
+
+```CSharp
+public class MyBackgroundService : BackgroundService
+{
+    private IMessageReceiver _messageReceiver;
+
+    public MyBackgroundService(IMessageReceiver messageReceiver)
+    {
+        _messageReceiver = messageReceiver;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await _messageReceiver.ListenAsync(stoppingToken);
+    }
+}
+
+public static async Task Main(string[] args)
+{
+    var host = new HostBuilder()
+        .ConfigureServices(services => 
+		{
+			services.AddSingleton<IMessageReceiver>(new InMemoryMessagePublisherReceiver());
+            services.AddHostedService<MyBackgroundService>();
+		})
+        .Build();
+
+    await host.RunAsync();
+}
+```
