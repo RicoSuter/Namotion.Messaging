@@ -25,7 +25,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
-        public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(messages
                 .GroupBy(m => m.PartitionId)

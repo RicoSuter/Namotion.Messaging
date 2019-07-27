@@ -13,6 +13,6 @@ namespace Namotion.Messaging.Abstractions
         /// <summary>
         /// Puts a batch of messages to the end of the queue.
         /// </summary>
-        Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default);
+        Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
     }
 }

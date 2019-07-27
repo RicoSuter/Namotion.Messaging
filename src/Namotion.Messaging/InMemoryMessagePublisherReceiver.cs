@@ -14,8 +14,8 @@ namespace Namotion.Messaging
         private readonly bool _awaitProcessing;
         private readonly List<QueueMessage> _deadLetterMessages = new List<QueueMessage>();
 
-        private Dictionary<Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task>, CancellationToken> funcs =
-            new Dictionary<Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task>, CancellationToken>();
+        private Dictionary<Func<IEnumerable<QueueMessage>, CancellationToken, Task>, CancellationToken> funcs =
+            new Dictionary<Func<IEnumerable<QueueMessage>, CancellationToken, Task>, CancellationToken>();
 
         public InMemoryMessagePublisherReceiver(bool awaitProcessing = false)
         {
@@ -24,12 +24,12 @@ namespace Namotion.Messaging
 
         public IEnumerable<QueueMessage> DeadLetterMessages => _deadLetterMessages;
 
-        public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             IEnumerable<Task> tasks;
             lock (_lock)
             {
-                _count += messages.Count;
+                _count += messages.Count();
                 tasks = funcs.Select(f => Task.Run(() => f.Key(messages, f.Value)));
             }
 
@@ -38,7 +38,7 @@ namespace Namotion.Messaging
                 {
                     lock (_lock)
                     {
-                        _count -= messages.Count;
+                        _count -= messages.Count();
                     }
                 });
 
@@ -48,7 +48,7 @@ namespace Namotion.Messaging
             }
         }
 
-        public async Task ListenAsync(Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace Namotion.Messaging
             }
         }
 
-        public Task ConfirmAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
@@ -76,7 +76,7 @@ namespace Namotion.Messaging
         public async Task RejectAsync(QueueMessage message, CancellationToken cancellationToken = default)
         {
             await Task.Delay(1000).ConfigureAwait(false);
-            await PutMessagesAsync(new QueueMessage[] { message }, cancellationToken).ConfigureAwait(false);
+            await SendAsync(new QueueMessage[] { message }, cancellationToken).ConfigureAwait(false);
         }
 
         public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)

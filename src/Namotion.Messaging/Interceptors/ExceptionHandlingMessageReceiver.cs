@@ -15,7 +15,7 @@ namespace Namotion.Messaging.Interceptors
             _messageReceiver = messageReceiver;
         }
 
-        public Task ListenAsync(Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
         {
             return _messageReceiver.ListenAsync(async (messages, ct) =>
             {
@@ -34,7 +34,7 @@ namespace Namotion.Messaging.Interceptors
             }, cancellationToken);
         }
 
-        public Task ConfirmAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             return _messageReceiver.ConfirmAsync(messages, cancellationToken);
         }

@@ -16,7 +16,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _queueClient = new QueueClient(connectionString, entityPath);
         }
 
-        public async Task PutMessagesAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             await _queueClient.SendAsync(messages.Select(m => CreateMessage(m)).ToList());
         }

@@ -9,11 +9,11 @@ namespace Namotion.Messaging.Abstractions
     {
         Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default);
 
-        Task ListenAsync(Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default);
+        Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default);
 
         Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default);
 
-        Task ConfirmAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default);
+        Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
 
         Task RejectAsync(QueueMessage message, CancellationToken cancellationToken = default);
 

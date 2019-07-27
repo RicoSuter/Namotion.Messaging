@@ -25,7 +25,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
         }
 
-        public async Task ListenAsync(Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             await _messageReceiver.RenewLockAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
         }
 
-        public async Task ConfirmAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(messages.Select(m =>
             {

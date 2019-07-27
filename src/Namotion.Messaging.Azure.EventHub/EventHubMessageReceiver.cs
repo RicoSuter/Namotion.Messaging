@@ -41,7 +41,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
-        public async Task ListenAsync(Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace Namotion.Messaging.Azure.EventHub
             throw new NotImplementedException();
         }
 
-        public Task ConfirmAsync(IReadOnlyCollection<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
         {
             // There is no message confirmation in Event Hubs, only checkpointing after processing
             return Task.CompletedTask;
@@ -87,13 +87,13 @@ namespace Namotion.Messaging.Azure.EventHub
 
         internal class EventProcessorFactory : IEventProcessorFactory
         {
-            private readonly Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> _onMessageAsync;
+            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _onMessageAsync;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
 
             public EventProcessorFactory(
-                Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync,
+                Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
@@ -115,14 +115,14 @@ namespace Namotion.Messaging.Azure.EventHub
             private const string SequenceNumberProperty = "x-opt-sequence-number";
             private const string OffsetProperty = "x-opt-offset";
 
-            private readonly Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> _onMessageAsync;
+            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _onMessageAsync;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
             private IDisposable _scope;
 
             public EventProcessor(
-                Func<IReadOnlyCollection<QueueMessage>, CancellationToken, Task> onMessageAsync,
+                Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
@@ -166,7 +166,7 @@ namespace Namotion.Messaging.Azure.EventHub
                         PartitionId = context.PartitionId,
                         Properties = m.Properties.ToDictionary(p => p.Key, p => p.Value),
                         SystemProperties = m.SystemProperties.ToDictionary(p => p.Key, p => p.Value)
-                    }).ToArray(), _cancellationToken);
+                    }), _cancellationToken);
 
                     _cancellationToken.ThrowIfCancellationRequested();
                     await context.CheckpointAsync();

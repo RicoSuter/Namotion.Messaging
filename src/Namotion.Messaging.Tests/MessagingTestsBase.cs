@@ -23,7 +23,6 @@ namespace Namotion.Messaging.Tests
 
             var count = 10;
             var content = Guid.NewGuid().ToByteArray();
-            var receiveCount = 0;
 
             var publisher = CreateMessagePublisher(config);
             var receiver = CreateMessageReceiver(config);
@@ -35,7 +34,6 @@ namespace Namotion.Messaging.Tests
             var receiveCancellation = new CancellationTokenSource();
             var task = receiver.ListenAsync(async (msgs, ct) =>
             {
-                receiveCount += msgs.Count;
                 foreach (var message in msgs
                     .Where(message => message.Content.SequenceEqual(content)))
                 {
@@ -51,7 +49,7 @@ namespace Namotion.Messaging.Tests
             }, listenCancellation.Token);
 
             var stopwatch = Stopwatch.StartNew();
-            await publisher.PutMessagesAsync(Enumerable.Range(1, count)
+            await publisher.SendAsync(Enumerable.Range(1, count)
                 .Select(i => CreateMessage(content))
                 .ToList());
 
