@@ -41,7 +41,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -59,27 +59,27 @@ namespace Namotion.Messaging.Azure.EventHub
             throw new NotImplementedException();
         }
 
-        public Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             // There is no message confirmation in Event Hubs, only checkpointing after processing
             return Task.CompletedTask;
         }
 
-        public Task RejectAsync(QueueMessage message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
         {
             // There is no message rejection in Event Hubs
             _logger.LogWarning("Message has been rejected which is not supported by Event Hub.");
             return Task.CompletedTask;
         }
 
-        public Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             // There is no dead letter queue in Event Hubs
             _logger.LogWarning("Message has been dead lettered which is not supported by Event Hub.");
             return Task.CompletedTask;
         }
 
-        public Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             // Keep alive is not needed as there is no timeout in Event Hubs
             return Task.CompletedTask;
@@ -87,13 +87,13 @@ namespace Namotion.Messaging.Azure.EventHub
 
         internal class EventProcessorFactory : IEventProcessorFactory
         {
-            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _handleMessages;
+            private readonly Func<IEnumerable<Message>, CancellationToken, Task> _handleMessages;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
 
             public EventProcessorFactory(
-                Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages,
+                Func<IEnumerable<Message>, CancellationToken, Task> handleMessages,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
@@ -115,14 +115,14 @@ namespace Namotion.Messaging.Azure.EventHub
             private const string SequenceNumberProperty = "x-opt-sequence-number";
             private const string OffsetProperty = "x-opt-offset";
 
-            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _handleMessages;
+            private readonly Func<IEnumerable<Message>, CancellationToken, Task> _handleMessages;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
             private IDisposable _scope;
 
             public EventProcessor(
-                Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages,
+                Func<IEnumerable<Message>, CancellationToken, Task> handleMessages,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
@@ -161,7 +161,7 @@ namespace Namotion.Messaging.Azure.EventHub
                     { "EventHub.Batch.EndOffset", messages.Last().SystemProperties[OffsetProperty] },
                 }))
                 {
-                    await _handleMessages(messages.Select(m => new QueueMessage(m.Body.Array)
+                    await _handleMessages(messages.Select(m => new Message(m.Body.Array)
                     {
                         PartitionId = context.PartitionId,
                         Properties = m.Properties.ToDictionary(p => p.Key, p => p.Value),

@@ -25,7 +25,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
-        public async Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(messages
                 .GroupBy(m => m.PartitionId)
@@ -44,7 +44,7 @@ namespace Namotion.Messaging.Azure.EventHub
                 }))).ConfigureAwait(false);
         }
 
-        private static EventData CreateEventData(QueueMessage message)
+        private static EventData CreateEventData(Message message)
         {
             var eventData = new EventData(message.Content);
 

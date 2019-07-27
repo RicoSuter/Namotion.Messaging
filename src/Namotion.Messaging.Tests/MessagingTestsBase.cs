@@ -28,7 +28,7 @@ namespace Namotion.Messaging.Tests
             var receiver = CreateMessageReceiver(config);
 
             // Act
-            var messages = new List<QueueMessage>();
+            var messages = new List<Message>();
 
             var listenCancellation = new CancellationTokenSource();
             var receiveCancellation = new CancellationTokenSource();
@@ -61,10 +61,10 @@ namespace Namotion.Messaging.Tests
             Validate(messages);
         }
 
-        protected virtual QueueMessage CreateMessage(byte[] content)
+        protected virtual Message CreateMessage(byte[] content)
         {
             // Arrange
-            return new QueueMessage(content)
+            return new Message(content)
             {
                 Properties =
                 {
@@ -73,7 +73,7 @@ namespace Namotion.Messaging.Tests
             };
         }
 
-        protected virtual void Validate(List<QueueMessage> messages)
+        protected virtual void Validate(List<Message> messages)
         {
             // Assert
             foreach (var message in messages)

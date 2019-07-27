@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
-using Namotion.Messaging.Abstractions;
 
 namespace Namotion.Messaging.Azure.ServiceBus
 {
@@ -25,14 +24,14 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var message = await _messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-                    await handleMessages(new QueueMessage[] { ToMessage(message) }, cancellationToken).ConfigureAwait(false);
+                    await handleMessages(new Abstractions.Message[] { ToMessage(message) }, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally
@@ -46,12 +45,12 @@ namespace Namotion.Messaging.Azure.ServiceBus
             throw new NotImplementedException();
         }
 
-        public async Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public async Task KeepAliveAsync(Abstractions.Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             await _messageReceiver.RenewLockAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
         }
 
-        public async Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(messages.Select(m =>
             {
@@ -59,19 +58,19 @@ namespace Namotion.Messaging.Azure.ServiceBus
             })).ConfigureAwait(false);
         }
 
-        public async Task RejectAsync(QueueMessage message, CancellationToken cancellationToken = default)
+        public async Task RejectAsync(Abstractions.Message message, CancellationToken cancellationToken = default)
         {
             await _messageReceiver.AbandonAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
         }
 
-        public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public async Task DeadLetterAsync(Abstractions.Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             await _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription).ConfigureAwait(false);
         }
 
-        private QueueMessage ToMessage(Message message)
+        private Abstractions.Message ToMessage(Microsoft.Azure.ServiceBus.Message message)
         {
-            var m = new QueueMessage(message.Body)
+            var m = new Abstractions.Message(message.Body)
             {
                 Id = message.MessageId,
                 DequeueCount = message.SystemProperties.DeliveryCount,

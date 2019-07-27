@@ -19,7 +19,7 @@ namespace Namotion.Messaging.RabbitMQ
             _configuration = configuration;
         }
 
-        public Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             if (_connection == null)
             {

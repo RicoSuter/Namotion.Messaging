@@ -5,13 +5,13 @@ namespace Namotion.Messaging.Abstractions
     /// <summary>
     /// A generic message to be used in all queue implementations.
     /// </summary>
-    public class QueueMessage
+    public class Message
     {
         /// <summary>
-        /// Creates an instance of <see cref="QueueMessage"/>.
+        /// Creates an instance of <see cref="Message"/>.
         /// </summary>
         /// <param name="content">The message content.</param>
-        public QueueMessage(byte[] content)
+        public Message(byte[] content)
         {
             Content = content;
         }
@@ -50,9 +50,9 @@ namespace Namotion.Messaging.Abstractions
         /// Clones the message.
         /// </summary>
         /// <returns>The cloned message.</returns>
-        public QueueMessage Clone()
+        public Message Clone()
         {
-            return new QueueMessage(Content)
+            return new Message(Content)
             {
                 Id = Id,
                 PartitionId = PartitionId,

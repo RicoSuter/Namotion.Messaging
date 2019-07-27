@@ -19,14 +19,14 @@ namespace Namotion.Messaging.Tests.Implementations
             return new ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue");
         }
 
-        protected override QueueMessage CreateMessage(byte[] content)
+        protected override Message CreateMessage(byte[] content)
         {
             var message = base.CreateMessage(content);
             message.Id = Guid.NewGuid().ToString();
             return message;
         }
 
-        protected override void Validate(List<QueueMessage> messages)
+        protected override void Validate(List<Message> messages)
         {
             foreach (var message in messages)
             {

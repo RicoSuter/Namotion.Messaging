@@ -23,7 +23,7 @@ namespace Namotion.Messaging.RabbitMQ
             _deadLetterPublisher = deadLetterPublisher;
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             var factory = new ConnectionFactory
             {
@@ -43,7 +43,7 @@ namespace Namotion.Messaging.RabbitMQ
                 var consumer = new AsyncEventingBasicConsumer(_channel);
                 consumer.Received += async (o, a) =>
                 {
-                    var message = new QueueMessage(a.Body)
+                    var message = new Message(a.Body)
                     {
                         Id = a.BasicProperties.MessageId,
                         SystemProperties =
@@ -52,7 +52,7 @@ namespace Namotion.Messaging.RabbitMQ
                         }
                     };
 
-                    await handleMessages(new QueueMessage[] { message }, cancellationToken);
+                    await handleMessages(new Message[] { message }, cancellationToken);
                 };
 
                 _channel.BasicConsume(_configuration.QueueName, _configuration.AutoAck, consumer);
@@ -66,7 +66,7 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.FromResult<long>(_channel.MessageCount(_configuration.QueueName));
         }
 
-        public Task ConfirmAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
 
@@ -78,7 +78,7 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.CompletedTask;
         }
 
-        public Task RejectAsync(QueueMessage message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
         {
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
 
@@ -86,14 +86,14 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.CompletedTask;
         }
 
-        public async Task DeadLetterAsync(QueueMessage message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public async Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             _ = _deadLetterPublisher ?? throw new InvalidOperationException("Dead letter publisher not specified.");
 
-            await _deadLetterPublisher.SendAsync(new QueueMessage[] { message }, cancellationToken).ConfigureAwait(false);
+            await _deadLetterPublisher.SendAsync(new Message[] { message }, cancellationToken).ConfigureAwait(false);
         }
 
-        public Task KeepAliveAsync(QueueMessage message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }

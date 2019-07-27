@@ -16,7 +16,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _queueClient = new QueueClient(connectionString, entityPath);
         }
 
-        public async Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default)
+        public async Task SendAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
             await _queueClient.SendAsync(messages.Select(m => CreateMessage(m)).ToList());
         }
@@ -26,9 +26,9 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _queueClient.CloseAsync().GetAwaiter().GetResult();
         }
 
-        private Message CreateMessage(QueueMessage message)
+        private Microsoft.Azure.ServiceBus.Message CreateMessage(Abstractions.Message message)
         {
-            var m = new Message(message.Content)
+            var m = new Microsoft.Azure.ServiceBus.Message(message.Content)
             {
                 MessageId = message.Id
             };
