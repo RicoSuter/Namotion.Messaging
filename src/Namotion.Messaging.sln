@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging", "Namotion.Messaging\Namotion.Messaging.csproj", "{064E1DAE-9A4B-43DC-8C3F-23BD46E56A9A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.Abstractions", "Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj", "{5855487E-599E-4EFF-A580-18A1E022B8A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.Azure.EventHub", "Namotion.Messaging.Azure.EventHub\Namotion.Messaging.Azure.EventHub.csproj", "{9F6084D7-DBF7-4465-9C55-B10FDEA2E042}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.Azure.ServiceBus", "Namotion.Messaging.Azure.ServiceBus\Namotion.Messaging.Azure.ServiceBus.csproj", "{3E645603-DACF-47DA-B461-E5FDED4FFED9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.RabbitMQ", "Namotion.Messaging.RabbitMQ\Namotion.Messaging.RabbitMQ.csproj", "{41935708-0E22-4A56-AAF7-24724D87560A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.Tests", "Namotion.Messaging.Tests\Namotion.Messaging.Tests.csproj", "{B0E7C3D0-D854-492B-8099-9F4EFFEE3ADD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E126E6CC-181A-40F8-9608-3DD3BEC4CBD6}"
+	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{064E1DAE-9A4B-43DC-8C3F-23BD46E56A9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{064E1DAE-9A4B-43DC-8C3F-23BD46E56A9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{064E1DAE-9A4B-43DC-8C3F-23BD46E56A9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{064E1DAE-9A4B-43DC-8C3F-23BD46E56A9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5855487E-599E-4EFF-A580-18A1E022B8A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5855487E-599E-4EFF-A580-18A1E022B8A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5855487E-599E-4EFF-A580-18A1E022B8A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5855487E-599E-4EFF-A580-18A1E022B8A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6084D7-DBF7-4465-9C55-B10FDEA2E042}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6084D7-DBF7-4465-9C55-B10FDEA2E042}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6084D7-DBF7-4465-9C55-B10FDEA2E042}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6084D7-DBF7-4465-9C55-B10FDEA2E042}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E645603-DACF-47DA-B461-E5FDED4FFED9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E645603-DACF-47DA-B461-E5FDED4FFED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E645603-DACF-47DA-B461-E5FDED4FFED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E645603-DACF-47DA-B461-E5FDED4FFED9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41935708-0E22-4A56-AAF7-24724D87560A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41935708-0E22-4A56-AAF7-24724D87560A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41935708-0E22-4A56-AAF7-24724D87560A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41935708-0E22-4A56-AAF7-24724D87560A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0E7C3D0-D854-492B-8099-9F4EFFEE3ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0E7C3D0-D854-492B-8099-9F4EFFEE3ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0E7C3D0-D854-492B-8099-9F4EFFEE3ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0E7C3D0-D854-492B-8099-9F4EFFEE3ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E4B441B5-66F7-41AC-94A2-7F495F4B0199}
+	EndGlobalSection
+EndGlobal
