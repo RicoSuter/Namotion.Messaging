@@ -15,13 +15,13 @@ namespace Namotion.Messaging.Interceptors
             _messageReceiver = messageReceiver;
         }
 
-        public Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             return _messageReceiver.ListenAsync(async (messages, ct) =>
             {
                 try
                 {
-                    await onMessageAsync(messages, ct).ConfigureAwait(false);
+                    await handleMessages(messages, ct).ConfigureAwait(false);
                 }
                 catch (Exception exception)
                 {

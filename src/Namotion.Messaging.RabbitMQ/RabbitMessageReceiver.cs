@@ -23,7 +23,7 @@ namespace Namotion.Messaging.RabbitMQ
             _deadLetterPublisher = deadLetterPublisher;
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             var factory = new ConnectionFactory
             {
@@ -52,7 +52,7 @@ namespace Namotion.Messaging.RabbitMQ
                         }
                     };
 
-                    await onMessageAsync(new QueueMessage[] { message }, cancellationToken);
+                    await handleMessages(new QueueMessage[] { message }, cancellationToken);
                 };
 
                 _channel.BasicConsume(_configuration.QueueName, _configuration.AutoAck, consumer);

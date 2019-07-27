@@ -11,7 +11,7 @@ namespace Namotion.Messaging.Abstractions
     public interface IMessagePublisher : IDisposable
     {
         /// <summary>
-        /// Puts a batch of messages to the end of the queue.
+        /// Sends a batch of messages to the queue.
         /// </summary>
         Task SendAsync(IEnumerable<QueueMessage> messages, CancellationToken cancellationToken = default);
     }

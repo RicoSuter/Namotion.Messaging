@@ -41,11 +41,11 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
-                await _host.RegisterEventProcessorFactoryAsync(new EventProcessorFactory(onMessageAsync, _host, _logger, cancellationToken), _processorOptions);
+                await _host.RegisterEventProcessorFactoryAsync(new EventProcessorFactory(handleMessages, _host, _logger, cancellationToken), _processorOptions);
                 await Task.Delay(Timeout.Infinite, cancellationToken);
             }
             finally
@@ -87,18 +87,18 @@ namespace Namotion.Messaging.Azure.EventHub
 
         internal class EventProcessorFactory : IEventProcessorFactory
         {
-            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _onMessageAsync;
+            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _handleMessages;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
 
             public EventProcessorFactory(
-                Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync,
+                Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
             {
-                _onMessageAsync = onMessageAsync;
+                _handleMessages = handleMessages;
                 _host = host;
                 _logger = logger;
                 _cancellationToken = cancellationToken;
@@ -106,7 +106,7 @@ namespace Namotion.Messaging.Azure.EventHub
 
             public IEventProcessor CreateEventProcessor(PartitionContext context)
             {
-                return new EventProcessor(_onMessageAsync, _host, _logger, _cancellationToken);
+                return new EventProcessor(_handleMessages, _host, _logger, _cancellationToken);
             }
         }
 
@@ -115,19 +115,19 @@ namespace Namotion.Messaging.Azure.EventHub
             private const string SequenceNumberProperty = "x-opt-sequence-number";
             private const string OffsetProperty = "x-opt-offset";
 
-            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _onMessageAsync;
+            private readonly Func<IEnumerable<QueueMessage>, CancellationToken, Task> _handleMessages;
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
             private IDisposable _scope;
 
             public EventProcessor(
-                Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync,
+                Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages,
                 EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
             {
-                _onMessageAsync = onMessageAsync;
+                _handleMessages = handleMessages;
                 _host = host;
                 _logger = logger;
                 _cancellationToken = cancellationToken;
@@ -161,7 +161,7 @@ namespace Namotion.Messaging.Azure.EventHub
                     { "EventHub.Batch.EndOffset", messages.Last().SystemProperties[OffsetProperty] },
                 }))
                 {
-                    await _onMessageAsync(messages.Select(m => new QueueMessage(m.Body.Array)
+                    await _handleMessages(messages.Select(m => new QueueMessage(m.Body.Array)
                     {
                         PartitionId = context.PartitionId,
                         Properties = m.Properties.ToDictionary(p => p.Key, p => p.Value),

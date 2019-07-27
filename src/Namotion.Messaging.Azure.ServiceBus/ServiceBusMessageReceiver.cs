@@ -25,14 +25,14 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var message = await _messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-                    await onMessageAsync(new QueueMessage[] { ToMessage(message) }, cancellationToken).ConfigureAwait(false);
+                    await handleMessages(new QueueMessage[] { ToMessage(message) }, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally

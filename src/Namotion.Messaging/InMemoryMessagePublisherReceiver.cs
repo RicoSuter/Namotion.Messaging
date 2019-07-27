@@ -48,13 +48,13 @@ namespace Namotion.Messaging
             }
         }
 
-        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> onMessageAsync, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IEnumerable<QueueMessage>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {
                 lock (_lock)
                 {
-                    funcs[onMessageAsync] = cancellationToken;
+                    funcs[handleMessages] = cancellationToken;
                 }
 
                 await Task.Delay(Timeout.Infinite, cancellationToken).ConfigureAwait(false);
@@ -63,7 +63,7 @@ namespace Namotion.Messaging
             {
                 lock (_lock)
                 {
-                    funcs.Remove(onMessageAsync);
+                    funcs.Remove(handleMessages);
                 }
             }
         }

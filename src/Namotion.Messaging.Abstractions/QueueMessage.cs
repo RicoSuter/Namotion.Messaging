@@ -3,12 +3,12 @@
 namespace Namotion.Messaging.Abstractions
 {
     /// <summary>
-    /// Message to be used in all the queueing code
+    /// A generic message to be used in all queue implementations.
     /// </summary>
     public class QueueMessage
     {
         /// <summary>
-        /// Creates an instance of <see cref="QueueMessage"/>
+        /// Creates an instance of <see cref="QueueMessage"/>.
         /// </summary>
         /// <param name="content">The message content.</param>
         public QueueMessage(byte[] content)
@@ -32,7 +32,7 @@ namespace Namotion.Messaging.Abstractions
         public string PartitionId { get; set; }
 
         /// <summary>
-        /// Gets or sets the count of how many time this message was dequeued
+        /// Gets or sets the count of how many time this message has been dequeued.
         /// </summary>
         public int DequeueCount { get; set; }
 
