@@ -30,6 +30,7 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             foreach (var message in messages)
             {
+                Assert.Equal(1, message.DequeueCount);
                 Assert.NotNull(message.Id);
             }
         }
