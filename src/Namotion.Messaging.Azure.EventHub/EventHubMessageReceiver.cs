@@ -45,7 +45,8 @@ namespace Namotion.Messaging.Azure.EventHub
         {
             try
             {
-                await _host.RegisterEventProcessorFactoryAsync(new EventProcessorFactory(handleMessages, _host, _logger, cancellationToken), _processorOptions);
+                var factory = new EventProcessorFactory(handleMessages, _host, _logger, cancellationToken);
+                await _host.RegisterEventProcessorFactoryAsync(factory, _processorOptions);
                 await Task.Delay(Timeout.Infinite, cancellationToken);
             }
             finally
@@ -119,6 +120,7 @@ namespace Namotion.Messaging.Azure.EventHub
             private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
+
             private IDisposable _scope;
 
             public EventProcessor(
@@ -135,7 +137,8 @@ namespace Namotion.Messaging.Azure.EventHub
 
             public Task OpenAsync(PartitionContext context)
             {
-                _logger.LogTrace("Start listening on partition {PartitionId}.", context.PartitionId);
+                _logger.LogInformation("Started receiving on partition {PartitionId}.", context.PartitionId);
+
                 _scope = _logger.BeginScope(new Dictionary<string, object>
                 {
                     { "EventHub.HostName", _host.HostName },
@@ -170,8 +173,6 @@ namespace Namotion.Messaging.Azure.EventHub
 
                     _cancellationToken.ThrowIfCancellationRequested();
                     await context.CheckpointAsync();
-
-                    _logger.LogTrace("Processed {Count} messages in partition {PartitionId}.", messages.Count(), context.PartitionId);
                 }
             }
 
@@ -183,8 +184,9 @@ namespace Namotion.Messaging.Azure.EventHub
 
             public Task CloseAsync(PartitionContext context, CloseReason reason)
             {
-                _logger.LogTrace("Stop listening on partition {PartitionId}.", context.PartitionId);
+                _logger.LogInformation("Stopped receiving on partition {PartitionId}.", context.PartitionId);
                 _scope?.Dispose();
+
                 return Task.CompletedTask;
             }
         }
