@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging
+namespace Namotion.Messaging.Interceptors
 {
     public class ExceptionHandlingMessageReceiver : IMessageReceiver
     {

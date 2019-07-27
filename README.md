@@ -7,47 +7,47 @@ This repository provides technology independent C# abstractions for message/even
 
 ## Packages
 
-**Namotion.Messaging.Abstractions**
+### Namotion.Messaging.Abstractions
 
 Contains the messaging abstractions, mainly interfaces with a very small footprint and extremely stable contracts:
 
 - IMessagePublisher
 - IMessageReceiver
 
-**Namotion.Messaging**
+### Namotion.Messaging
 
 Contains common helper methods and technology independent implementations for the abstractions:
 
 - **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments.
 
-**Namotion.Messaging.Azure.EventHub**
+### Namotion.Messaging.Azure.ServiceBus
 
 Implementations:
 
-- EventHubMessagePublisher
-- EventHubMessageReceiver
-
-Dependencies: 
-
-- Microsoft.Azure.EventHubs.Processor
-
-**Namotion.Messaging.Azure.ServiceBus**
-
-Implementations:
-
-- ServiceBusMessagePublisher
-- ServiceBusMessageReceiver
+- **ServiceBusMessagePublisher**
+- **ServiceBusMessageReceiver**
 
 Dependencies: 
 
 - Microsoft.Azure.ServiceBus
 
-**Namotion.Messaging.RabbitMQ**
+### Namotion.Messaging.Azure.EventHub
 
 Implementations:
 
-- RabbitMessagePublisher
-- RabbitMessageReceiver
+- **EventHubMessagePublisher**
+- **EventHubMessageReceiver**
+
+Dependencies: 
+
+- Microsoft.Azure.EventHubs.Processor
+
+### Namotion.Messaging.RabbitMQ
+
+Implementations:
+
+- **RabbitMessagePublisher**
+- **RabbitMessageReceiver**
 
 Dependencies: 
 
@@ -75,10 +75,11 @@ public static async Task Main(string[] args)
 {
     var host = new HostBuilder()
         .ConfigureServices(services => 
-		{
-			services.AddSingleton<IMessageReceiver>(new InMemoryMessagePublisherReceiver());
+        {
+			var receiver = new ServiceBusMessagePublisher("MyConnectionString"], "myqueue");
+            services.AddSingleton<IMessageReceiver>(receiver);
             services.AddHostedService<MyBackgroundService>();
-		})
+        })
         .Build();
 
     await host.RunAsync();

@@ -3,6 +3,7 @@ using System;
 using Namotion.Messaging.Abstractions;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using Namotion.Messaging.Azure.ServiceBus;
 
 namespace Namotion.Messaging.Tests.Implementations
 {
@@ -10,12 +11,12 @@ namespace Namotion.Messaging.Tests.Implementations
     {
         protected override IMessageReceiver CreateMessageReceiver(IConfiguration configuration)
         {
-            return new Azure.ServiceBus.ServiceBusMessageReceiver(configuration["ServiceBusConnectionString"], "myqueue");
+            return new ServiceBusMessageReceiver(configuration["ServiceBusConnectionString"], "myqueue");
         }
 
         protected override IMessagePublisher CreateMessagePublisher(IConfiguration configuration)
         {
-            return new Azure.ServiceBus.ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue");
+            return new ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue");
         }
 
         protected override QueueMessage CreateMessage(byte[] content)
