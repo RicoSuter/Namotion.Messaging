@@ -3,7 +3,14 @@
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://rsuter.visualstudio.com/Namotion/_build?definitionId=19)
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
 
-This repository provides technology independent C# abstractions for message/event queues and data ingestion services to build multi-cloud capable applications and behavior driven integration testing and improved local development experiences.
+The Namotion.Messaging .NET libraries provide abstractions and implementations for message/event queues and data ingestion services.
+
+This enables the following scenarios: 
+
+- Build multi-cloud capable applications by easily change messaging technologies on demand.
+- Quickly try out different messaging technologies to find the best fit for your applications.
+- Implement behavior driven integration tests which can run in-memory or against different technologies for debugging and faster exection. 
+- Provide better local development experiences (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
 
 ## Packages
 
@@ -11,8 +18,9 @@ This repository provides technology independent C# abstractions for message/even
 
 Contains the messaging abstractions, mainly interfaces with a very small footprint and extremely stable contracts:
 
-- IMessagePublisher
-- IMessageReceiver
+- **IMessagePublisher**
+- **IMessageReceiver**
+- **Message:** A generic message/event implementation.
 
 ### Namotion.Messaging
 
@@ -76,7 +84,7 @@ public static async Task Main(string[] args)
     var host = new HostBuilder()
         .ConfigureServices(services => 
         {
-			var receiver = new ServiceBusMessagePublisher("MyConnectionString"], "myqueue");
+            var receiver = new ServiceBusMessagePublisher("MyConnectionString", "myqueue");
             services.AddSingleton<IMessageReceiver>(receiver);
             services.AddHostedService<MyBackgroundService>();
         })
