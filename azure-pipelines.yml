@@ -58,6 +58,10 @@ steps:
     arguments: '--configuration $(BuildConfiguration)'
     feedsToUse: 'select'
     versioningScheme: 'off'
+  env:
+    EventHubConnectionString: $(EventHubConnectionString)
+    EventHubStorageConnectionString: $(EventHubStorageConnectionString)
+    ServiceBusConnectionString: $(ServiceBusConnectionString)
 
 # Publish artifacts
 - task: CopyFiles@2
