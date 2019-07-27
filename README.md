@@ -7,10 +7,10 @@ The Namotion.Messaging .NET libraries provide abstractions and implementations f
 
 This enables the following scenarios: 
 
-- Build multi-cloud capable applications by easily change messaging technologies on demand.
-- Quickly try out different messaging technologies to find the best fit for your applications.
-- Implement behavior driven integration tests which can run in-memory or against different technologies for debugging and faster exection. 
-- Provide better local development experiences (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
+- Build **multi-cloud capable applications** by easily change messaging technologies on demand.
+- Quickly **try out different messaging technologies** to find the best fit for your applications.
+- Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster exection. 
+- Provide **better local development experiences** (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
 
 ## Packages
 
@@ -20,13 +20,13 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 
 - **IMessagePublisher**
 - **IMessageReceiver**
-- **Message:** A generic message/event implementation.
+- **Message:** A generic message implementation.
 
 ### Namotion.Messaging
 
 Contains common helper methods and technology independent implementations for the abstractions:
 
-- **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments.
+- **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments (i.e. use this implementation when no connection strings are defined).
 
 ### Namotion.Messaging.Azure.ServiceBus
 
