@@ -11,10 +11,16 @@ namespace Namotion.Messaging.Abstractions
         /// Creates an instance of <see cref="Message{T}"/>.
         /// </summary>
         /// <param name="content">The message content.</param>
-        public Message(byte[] content, T obj)
-            : base(content)
+        public Message(
+            string id = null,
+            byte[] content = null,
+            T deserializedObject = default,
+            IReadOnlyDictionary<string, object> properties = null,
+            IReadOnlyDictionary<string, object> systemProperties = null,
+            string partitionId = null)
+            : base(id, content, properties, systemProperties, partitionId)
         {
-            Object = obj;
+            Object = deserializedObject;
         }
 
         /// <summary>
@@ -33,14 +39,32 @@ namespace Namotion.Messaging.Abstractions
         /// </summary>
         /// <param name="content">The message content.</param>
         public Message(byte[] content)
+            : this(null, content: content)
         {
-            Content = content;
         }
 
         /// <summary>
-        /// Gets or sets the message ID.
+        /// Creates an instance of <see cref="Message"/>.
         /// </summary>
-        public string Id { get; set; }
+        /// <param name="content">The message content.</param>
+        public Message(
+            string id = null,
+            byte[] content = null,
+            IReadOnlyDictionary<string, object> properties = null,
+            IReadOnlyDictionary<string, object> systemProperties = null,
+            string partitionId = null)
+        {
+            Id = id;
+            Content = content ?? new byte[0];
+            Properties = properties ?? new Dictionary<string, object>();
+            SystemProperties = systemProperties ?? new Dictionary<string, object>();
+            PartitionId = partitionId;
+        }
+
+        /// <summary>
+        /// Gets the message ID.
+        /// </summary>
+        public string Id { get; }
 
         /// <summary>
         /// Gets the message content as byte array.
@@ -48,24 +72,19 @@ namespace Namotion.Messaging.Abstractions
         public byte[] Content { get; }
 
         /// <summary>
-        /// Gets or sets the partition key.
+        /// Gets the partition key.
         /// </summary>
-        public string PartitionId { get; set; }
+        public string PartitionId { get; }
 
         /// <summary>
-        /// Gets or sets the count of how many time this message has been dequeued.
+        /// Gets the properties for this message.
         /// </summary>
-        public int DequeueCount { get; set; }
+        public IReadOnlyDictionary<string, object> Properties { get; }
 
         /// <summary>
-        /// Gets or sets the properties for this message.
+        /// Gets the internal properties for this message.
         /// </summary>
-        public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
-
-        /// <summary>
-        /// Gets or sets the internal properties for this message.
-        /// </summary>
-        public Dictionary<string, object> SystemProperties { get; set; } = new Dictionary<string, object>();
+        public IReadOnlyDictionary<string, object> SystemProperties { get; }
 
         /// <summary>
         /// Clones the message.
@@ -73,13 +92,7 @@ namespace Namotion.Messaging.Abstractions
         /// <returns>The cloned message.</returns>
         public Message Clone()
         {
-            return new Message(Content)
-            {
-                Id = Id,
-                PartitionId = PartitionId,
-                DequeueCount = DequeueCount,
-                Properties = new Dictionary<string, object>(Properties)
-            };
+            return new Message(Id, Content, Properties, SystemProperties, PartitionId);
         }
     }
 }

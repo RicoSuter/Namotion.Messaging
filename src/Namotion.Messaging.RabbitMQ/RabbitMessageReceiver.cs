@@ -43,14 +43,14 @@ namespace Namotion.Messaging.RabbitMQ
                 var consumer = new AsyncEventingBasicConsumer(_channel);
                 consumer.Received += async (o, a) =>
                 {
-                    var message = new Message(a.Body)
-                    {
-                        Id = a.BasicProperties.MessageId,
-                        SystemProperties =
+                    var message = new Message(
+                        id: a.BasicProperties.MessageId,
+                        content: a.Body,
+                        systemProperties: new Dictionary<string, object>
                         {
                             { DeliveryTagProperty, a.DeliveryTag }
                         }
-                    };
+                    );
 
                     await handleMessages(new Message[] { message }, cancellationToken);
                 };

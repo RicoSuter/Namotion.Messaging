@@ -28,15 +28,14 @@ namespace Namotion.Messaging.Json
         private static Message<T> ConvertFromMessage<T>(Message message)
         {
             var json = Encoding.UTF8.GetString(message.Content);
-            var obj = JsonConvert.DeserializeObject<T>(json, serializerSettings);
-            return new Message<T>(message.Content, obj)
-            {
-                Id = message.Id,
-                DequeueCount = message.DequeueCount,
-                PartitionId = message.PartitionId,
-                Properties = message.Properties,
-                SystemProperties = message.SystemProperties
-            };
+            var deserializedObject = JsonConvert.DeserializeObject<T>(json, serializerSettings);
+            return new Message<T>(
+                message.Id,
+                message.Content,
+                deserializedObject,
+                message.Properties,
+                message.SystemProperties,
+                message.PartitionId);
         }
     }
 }

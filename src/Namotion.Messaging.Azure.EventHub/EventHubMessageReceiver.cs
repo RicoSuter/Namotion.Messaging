@@ -156,20 +156,19 @@ namespace Namotion.Messaging.Azure.EventHub
                 {
                     { "EventHub.Batch.Scope", Guid.NewGuid() },
                     { "EventHub.Batch.MessageCount", messages.Count() },
-
                     { "EventHub.Batch.StartSequenceNumber", messages.First().SystemProperties[SequenceNumberProperty] },
                     { "EventHub.Batch.EndSequenceNumber", messages.Last().SystemProperties[SequenceNumberProperty] },
-
                     { "EventHub.Batch.StartOffset", messages.First().SystemProperties[OffsetProperty] },
                     { "EventHub.Batch.EndOffset", messages.Last().SystemProperties[OffsetProperty] },
                 }))
                 {
-                    await _handleMessages(messages.Select(m => new Message(m.Body.Array)
-                    {
-                        PartitionId = context.PartitionId,
-                        Properties = m.Properties.ToDictionary(p => p.Key, p => p.Value),
-                        SystemProperties = m.SystemProperties.ToDictionary(p => p.Key, p => p.Value)
-                    }).ToArray(), _cancellationToken);
+                    await _handleMessages(messages.Select(m => new Message(
+                        id: m.SystemProperties.PartitionKey + "-" + m.SystemProperties.SequenceNumber,
+                        content: m.Body.Array,
+                        partitionId: context.PartitionId,
+                        properties: m.Properties.ToDictionary(p => p.Key, p => p.Value),
+                        systemProperties: m.SystemProperties.ToDictionary(p => p.Key, p => p.Value))
+                    ).ToArray(), _cancellationToken);
 
                     _cancellationToken.ThrowIfCancellationRequested();
                     await context.CheckpointAsync();

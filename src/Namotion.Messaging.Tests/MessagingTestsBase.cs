@@ -54,7 +54,7 @@ namespace Namotion.Messaging.Tests
                 .Select(i => CreateMessage(content))
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(300), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert
@@ -103,7 +103,7 @@ namespace Namotion.Messaging.Tests
                 .Select(i => new MyMessage { Id = orderId })
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(300), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert
@@ -118,13 +118,12 @@ namespace Namotion.Messaging.Tests
         protected virtual Message CreateMessage(byte[] content)
         {
             // Arrange
-            return new Message(content)
-            {
-                Properties =
+            return new Message(
+                content: content,
+                properties: new Dictionary<string, object>
                 {
                     { "x-my-property", "hello" }
-                }
-            };
+                });
         }
 
         protected virtual void Validate(List<Message> messages)

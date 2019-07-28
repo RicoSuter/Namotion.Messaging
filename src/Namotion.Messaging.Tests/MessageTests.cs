@@ -9,10 +9,7 @@ namespace Namotion.Messaging.Tests
         public void WhenMessageIsCloned_ThenPropertiesAreCopied()
         {
             // Arrange
-            var message = new Message(new byte[] { 1 })
-            {
-                Id = "abc"
-            };
+            var message = new Message("abc", new byte[] { 1 });
 
             // Act
             var clone = message.Clone();

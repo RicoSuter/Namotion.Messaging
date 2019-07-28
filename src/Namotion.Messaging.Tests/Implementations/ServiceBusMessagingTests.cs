@@ -25,7 +25,7 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             foreach (var message in messages)
             {
-                Assert.Equal(1, message.DequeueCount);
+                Assert.Equal(1, message.SystemProperties["DeliveryCount"]);
                 Assert.NotNull(message.Id);
             }
         }

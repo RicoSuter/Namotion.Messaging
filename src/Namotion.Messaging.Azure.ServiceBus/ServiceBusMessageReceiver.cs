@@ -11,6 +11,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
     public class ServiceBusMessageReceiver : Abstractions.IMessageReceiver
     {
         private const string LockTokenProperty = "LockToken";
+        private const string DeliveryCountProperty = "DeliveryCount";
 
         private MessageReceiver _messageReceiver;
 
@@ -68,24 +69,17 @@ namespace Namotion.Messaging.Azure.ServiceBus
             await _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription).ConfigureAwait(false);
         }
 
-        private Abstractions.Message ToMessage(Microsoft.Azure.ServiceBus.Message message)
+        private Abstractions.Message ToMessage(Message message)
         {
-            var m = new Abstractions.Message(message.Body)
-            {
-                Id = message.MessageId,
-                DequeueCount = message.SystemProperties.DeliveryCount,
-                SystemProperties =
+            return new Abstractions.Message(
+                id: message.MessageId,
+                content: message.Body,
+                properties: message.UserProperties.ToDictionary(t => t.Key, t => t.Value),
+                systemProperties: new Dictionary<string, object>
                 {
-                    { LockTokenProperty, message.SystemProperties.LockToken }
-                }
-            };
-
-            foreach (var property in message.UserProperties)
-            {
-                m.Properties[property.Key] = property.Value;
-            }
-
-            return m;
+                    { LockTokenProperty, message.SystemProperties.LockToken },
+                    { DeliveryCountProperty, message.SystemProperties.DeliveryCount },
+                });
         }
     }
 }
