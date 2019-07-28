@@ -10,10 +10,12 @@ namespace Namotion.Messaging.Azure.EventHub
     public class EventHubMessagePublisher : IMessagePublisher
     {
         private readonly EventHubClient _client;
+        private readonly long _maxMessageSize;
 
-        public EventHubMessagePublisher(string connectionString)
+        public EventHubMessagePublisher(string connectionString, long maxMessageSize = 262144)
             : this(EventHubClient.CreateFromConnectionString(connectionString))
         {
+            _maxMessageSize = maxMessageSize;
         }
 
         public EventHubMessagePublisher(EventHubClient client)
@@ -27,13 +29,37 @@ namespace Namotion.Messaging.Azure.EventHub
                 .GroupBy(m => m.PartitionId)
                 .Select(g => Task.Run(async () =>
                 {
-                    if (string.IsNullOrEmpty(g.Key))
+                    var batch = _client.CreateBatch(new BatchOptions
                     {
-                        await _client.SendAsync(g.Select(m => CreateEventData(m))).ConfigureAwait(false);
+                        PartitionKey = g.Key,
+                        MaxMessageSize = _maxMessageSize
+                    });
+
+                    try
+                    {
+                        foreach (var message in g)
+                        {
+                            if (!batch.TryAdd(CreateEventData(message)))
+                            {
+                                await _client.SendAsync(batch);
+
+                                batch.Dispose();
+                                batch = _client.CreateBatch(new BatchOptions
+                                {
+                                    PartitionKey = g.Key,
+                                    MaxMessageSize = _maxMessageSize
+                                });
+                            }
+                        }
+
+                        if (batch.Count > 0)
+                        {
+                            await _client.SendAsync(batch);
+                        }
                     }
-                    else
+                    finally
                     {
-                        await _client.SendAsync(g.Select(m => CreateEventData(m)), g.Key).ConfigureAwait(false);
+                        batch.Dispose();
                     }
                 }))).ConfigureAwait(false);
         }

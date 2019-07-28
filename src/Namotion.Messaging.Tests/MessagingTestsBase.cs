@@ -21,7 +21,7 @@ namespace Namotion.Messaging.Tests
                 .AddEnvironmentVariables()
                 .Build();
 
-            var count = 10;
+            int count = GetMessageCount();
             var content = Guid.NewGuid().ToByteArray();
 
             var publisher = CreateMessagePublisher(config);
@@ -53,12 +53,17 @@ namespace Namotion.Messaging.Tests
                 .Select(i => CreateMessage(content))
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(300), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert
             Assert.Equal(count, messages.Count);
             Validate(messages);
+        }
+
+        protected virtual int GetMessageCount()
+        {
+            return 10;
         }
 
         protected virtual Message CreateMessage(byte[] content)
