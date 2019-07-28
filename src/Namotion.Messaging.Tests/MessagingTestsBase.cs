@@ -85,7 +85,7 @@ namespace Namotion.Messaging.Tests
             var task = receiver.ListenJsonAsync(async (msgs, ct) =>
             {
                 foreach (var message in msgs
-                    .Where(message => message.Object.Id == orderId))
+                    .Where(message => message.Object?.Id == orderId))
                 {
                     messages.Add(message);
                 }

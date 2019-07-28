@@ -27,8 +27,18 @@ namespace Namotion.Messaging.Json
 
         private static Message<T> ConvertFromMessage<T>(Message message)
         {
-            var json = Encoding.UTF8.GetString(message.Content);
-            var deserializedObject = JsonConvert.DeserializeObject<T>(json, serializerSettings);
+            T deserializedObject;
+            try
+            {
+                var json = Encoding.UTF8.GetString(message.Content);
+                deserializedObject = JsonConvert.DeserializeObject<T>(json, serializerSettings);
+            }
+            catch
+            {
+                deserializedObject = default;
+                // TODO: What to do here?
+            }
+
             return new Message<T>(
                 message.Id,
                 message.Content,
