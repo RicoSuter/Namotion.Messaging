@@ -9,21 +9,16 @@ namespace Namotion.Messaging.Tests.Implementations
 {
     public class ServiceBusMessagingTests : MessagingTestsBase
     {
-        protected override IMessageReceiver CreateMessageReceiver(IConfiguration configuration)
+        protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
-            return new ServiceBusMessageReceiver(configuration["ServiceBusConnectionString"], "myqueue");
+            return new ServiceBusMessageReceiver(configuration["ServiceBusConnectionString"], "myqueue")
+                .For<MyMessage>();
         }
 
-        protected override IMessagePublisher CreateMessagePublisher(IConfiguration configuration)
+        protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
-            return new ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue");
-        }
-
-        protected override Message CreateMessage(byte[] content)
-        {
-            var message = base.CreateMessage(content);
-            message.Id = Guid.NewGuid().ToString();
-            return message;
+            return new ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue")
+                .For<MyMessage>();
         }
 
         protected override void Validate(List<Message> messages)

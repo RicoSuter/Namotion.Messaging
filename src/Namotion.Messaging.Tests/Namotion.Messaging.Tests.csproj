@@ -15,6 +15,7 @@
     <ProjectReference Include="..\Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\Namotion.Messaging.Azure.EventHub\Namotion.Messaging.Azure.EventHub.csproj" />
     <ProjectReference Include="..\Namotion.Messaging.Azure.ServiceBus\Namotion.Messaging.Azure.ServiceBus.csproj" />
+    <ProjectReference Include="..\Namotion.Messaging.Json\Namotion.Messaging.Json.csproj" />
     <ProjectReference Include="..\Namotion.Messaging\Namotion.Messaging.csproj" />
   </ItemGroup>
   <ItemGroup>
