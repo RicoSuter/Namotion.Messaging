@@ -9,7 +9,7 @@ This enables the following scenarios:
 
 - Build **multi-cloud capable applications** by easily change messaging technologies on demand.
 - Quickly **try out different messaging technologies** to find the best fit for your applications.
-- Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster exection. 
+- Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster execution. 
 - Provide **better local development experiences** (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
 
 ## Packages
