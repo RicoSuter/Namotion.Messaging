@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         {
             var m = new Microsoft.Azure.ServiceBus.Message(message.Content)
             {
-                MessageId = message.Id
+                MessageId = message.Id ?? Guid.NewGuid().ToString()
             };
 
             foreach (var property in message.Properties)
