@@ -12,13 +12,13 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return new ServiceBusMessageReceiver(configuration["ServiceBusConnectionString"], "myqueue")
-                .For<MyMessage>();
+                .WithMessageType<MyMessage>();
         }
 
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
             return new ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue")
-                .For<MyMessage>();
+                .WithMessageType<MyMessage>();
         }
 
         protected override void Validate(List<Message> messages)

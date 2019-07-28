@@ -78,7 +78,7 @@ namespace Namotion.Messaging.Tests
             var receiver = CreateMessageReceiver(config);
 
             // Act
-            var messages = new List<ObjectMessage<MyMessage>>();
+            var messages = new List<Message<MyMessage>>();
 
             var listenCancellation = new CancellationTokenSource();
             var receiveCancellation = new CancellationTokenSource();

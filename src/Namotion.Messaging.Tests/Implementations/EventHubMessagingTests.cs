@@ -10,7 +10,7 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
             return new EventHubMessagePublisher(configuration["EventHubConnectionString"])
-                .For<MyMessage>();
+                .WithMessageType<MyMessage>();
         }
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
@@ -22,7 +22,7 @@ namespace Namotion.Messaging.Tests.Implementations
                     configuration["EventHubStorageConnectionString"],
                     "myeventhub"),
                 new EventProcessorOptions { PrefetchCount = 500, MaxBatchSize = 100 })
-                .For<MyMessage>();
+                .WithMessageType<MyMessage>();
         }
 
         protected override int GetMessageCount()

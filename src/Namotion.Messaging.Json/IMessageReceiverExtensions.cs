@@ -19,17 +19,17 @@ namespace Namotion.Messaging.Json
 
         public static Task ListenJsonAsync<T>(
             this IMessageReceiver<T> messageReceiver,
-            Func<IReadOnlyCollection<ObjectMessage<T>>, CancellationToken, Task> handleMessages,
+            Func<IReadOnlyCollection<Message<T>>, CancellationToken, Task> handleMessages,
             CancellationToken cancellationToken = default)
         {
             return messageReceiver.ListenAsync((messages, ct) => handleMessages(messages.Select(ConvertFromMessage<T>).ToArray(), ct), cancellationToken);
         }
 
-        private static ObjectMessage<T> ConvertFromMessage<T>(Message message)
+        private static Message<T> ConvertFromMessage<T>(Message message)
         {
             var json = Encoding.UTF8.GetString(message.Content);
             var obj = JsonConvert.DeserializeObject<T>(json, serializerSettings);
-            return new ObjectMessage<T>(message.Content, obj)
+            return new Message<T>(message.Content, obj)
             {
                 Id = message.Id,
                 DequeueCount = message.DequeueCount,

@@ -14,12 +14,12 @@ namespace Namotion.Messaging.Tests.Implementations
 
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
-            return ((IMessagePublisher)_publisherReceiver).For<MyMessage>();
+            return ((IMessagePublisher)_publisherReceiver).WithMessageType<MyMessage>();
         }
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
-            return ((IMessageReceiver)_publisherReceiver).For<MyMessage>();
+            return ((IMessageReceiver)_publisherReceiver).WithMessageType<MyMessage>();
         }
     }
 }

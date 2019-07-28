@@ -5,7 +5,7 @@ namespace Namotion.Messaging
 {
     public static class IMessagePublisherExtensions
     {
-        public static IMessagePublisher<T> For<T>(this IMessagePublisher messagePublisher)
+        public static IMessagePublisher<T> WithMessageType<T>(this IMessagePublisher messagePublisher)
         {
             return new MessagePublisher<T>(messagePublisher);
         }

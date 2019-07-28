@@ -11,7 +11,7 @@ namespace Namotion.Messaging
             return new ExceptionHandlingMessageReceiver(messageReceiver, logger);
         }
 
-        public static IMessageReceiver<T> For<T>(this IMessageReceiver messageReceiver)
+        public static IMessageReceiver<T> WithMessageType<T>(this IMessageReceiver messageReceiver)
         {
             return new MessageReceiver<T>(messageReceiver);
         }

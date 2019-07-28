@@ -3,6 +3,27 @@
 namespace Namotion.Messaging.Abstractions
 {
     /// <summary>
+    /// A generic message with deserialized content to be used in all queue implementations.
+    /// </summary>
+    public class Message<T> : Message
+    {
+        /// <summary>
+        /// Creates an instance of <see cref="Message{T}"/>.
+        /// </summary>
+        /// <param name="content">The message content.</param>
+        public Message(byte[] content, T obj)
+            : base(content)
+        {
+            Object = obj;
+        }
+
+        /// <summary>
+        /// Gets the JSON deserialzed content.
+        /// </summary>
+        public T Object { get; }
+    }
+
+    /// <summary>
     /// A generic message to be used in all queue implementations.
     /// </summary>
     public class Message
