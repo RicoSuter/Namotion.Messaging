@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Abstractions
 {
+    /// <summary>
+    /// <see cref="IMessagePublisher"/> extension methods.
+    /// </summary>
     public static class IMessagePublisherExtensions
     {
         /// <summary>
@@ -11,7 +14,7 @@ namespace Namotion.Messaging.Abstractions
         /// <param name="messagePublisher">The message publisher.</param>
         /// <param name="message">The message.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns></returns>
+        /// <returns>The task.</returns>
         public static Task SendAsync(this IMessagePublisher messagePublisher, Message message, CancellationToken cancellationToken = default)
         {
             return messagePublisher.SendAsync(new Message[] { message }, cancellationToken);

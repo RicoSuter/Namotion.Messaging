@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Json
 {
+    /// <summary>
+    /// <see cref="IMessageReceiver"/> extension methods.
+    /// </summary>
     public static class IMessageReceiverExtensions
     {
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
@@ -17,6 +20,14 @@ namespace Namotion.Messaging.Json
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
 
+        /// <summary>
+        /// Receives messages, deserializes the JSON in the content and passes the result to the <paramref name="handleMessages"/> callback.
+        /// The task does not complete until the <paramref name="cancellationToken"/> is cancelled.
+        /// </summary>
+        /// <param name="messageReceiver">The message receiver.</param>
+        /// <param name="handleMessages">The message handler callback.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
         public static Task ListenJsonAsync<T>(
             this IMessageReceiver<T> messageReceiver,
             Func<IReadOnlyCollection<Message<T>>, CancellationToken, Task> handleMessages,

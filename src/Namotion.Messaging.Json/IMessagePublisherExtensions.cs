@@ -16,11 +16,25 @@ namespace Namotion.Messaging.Json
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
 
+        /// <summary>
+        /// Serializes the message to JSON and sends a single message to the queue.
+        /// </summary>
+        /// <param name="messagePublisher">The message publisher.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
         public static Task SendJsonAsync<T>(this IMessagePublisher<T> messagePublisher, T message, CancellationToken cancellationToken = default)
         {
             return messagePublisher.SendAsync(ConvertToMessage(message), cancellationToken);
         }
 
+        /// <summary>
+        /// Serializes the messages to JSON and sends them to the queue.
+        /// </summary>
+        /// <param name="messagePublisher">The message publisher.</param>
+        /// <param name="messages">The messages.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
         public static Task SendJsonAsync<T>(this IMessagePublisher<T> messagePublisher, IEnumerable<T> messages, CancellationToken cancellationToken = default)
         {
             return messagePublisher.SendAsync(messages.Select(ConvertToMessage), cancellationToken);

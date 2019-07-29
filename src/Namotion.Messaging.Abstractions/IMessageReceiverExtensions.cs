@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Abstractions
 {
+    /// <summary>
+    /// <see cref="IMessagePublisher"/> extension methods.
+    /// </summary>
     public static class IMessageReceiverExtensions
     {
         /// <summary>

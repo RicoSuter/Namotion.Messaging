@@ -31,17 +31,17 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
         private Microsoft.Azure.ServiceBus.Message CreateMessage(Abstractions.Message message)
         {
-            var m = new Microsoft.Azure.ServiceBus.Message(message.Content)
+            var abstractMessage = new Microsoft.Azure.ServiceBus.Message(message.Content)
             {
                 MessageId = message.Id ?? Guid.NewGuid().ToString()
             };
 
             foreach (var property in message.Properties)
             {
-                m.UserProperties[property.Key] = property.Value;
+                abstractMessage.UserProperties[property.Key] = property.Value;
             }
 
-            return m;
+            return abstractMessage;
         }
     }
 }

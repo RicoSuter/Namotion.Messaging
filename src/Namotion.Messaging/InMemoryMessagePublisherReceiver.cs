@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging
 {
+    /// <summary>
+    /// An in-memory message publisher and receiver implementation.
+    /// </summary>
     public class InMemoryMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
     {
         private long _count = 0;
@@ -22,8 +25,12 @@ namespace Namotion.Messaging
             _awaitProcessing = awaitProcessing;
         }
 
+        /// <summary>
+        /// Gets the dead lettered messages.
+        /// </summary>
         public IEnumerable<Message> DeadLetterMessages => _deadLetterMessages;
 
+        /// <inheritdoc/>
         public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             IEnumerable<Task> tasks;
@@ -48,6 +55,7 @@ namespace Namotion.Messaging
             }
         }
 
+        /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
@@ -68,17 +76,20 @@ namespace Namotion.Messaging
             }
         }
 
+        /// <inheritdoc/>
         public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public async Task RejectAsync(Message message, CancellationToken cancellationToken = default)
         {
             await Task.Delay(1000).ConfigureAwait(false);
             await SendAsync(new Message[] { message }, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             lock (_lock)
@@ -89,16 +100,19 @@ namespace Namotion.Messaging
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult(_count);
         }
 
+        /// <inheritdoc/>
         public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
         }

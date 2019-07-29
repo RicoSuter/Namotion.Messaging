@@ -29,7 +29,7 @@ namespace Namotion.Messaging.Abstractions
         /// The task does not complete until the <paramref name="cancellationToken"/> is cancelled.
         /// </summary>
         /// <param name="handleMessages">The message handler callback.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
         Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default);
 
