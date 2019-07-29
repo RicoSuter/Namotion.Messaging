@@ -1,7 +1,6 @@
 # Namotion.Messaging
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://rsuter.visualstudio.com/Namotion/_build?definitionId=19)
-[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
 
 The Namotion.Messaging .NET libraries provide abstractions and implementations for message/event queues and data ingestion services.
 
@@ -15,6 +14,8 @@ This enables the following scenarios:
 ## Core packages
 
 ### Namotion.Messaging.Abstractions
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Abstractions.svg)](https://www.nuget.org/packages/Namotion.Messaging.Abstractions/)
 
 Contains the messaging abstractions, mainly interfaces with a very small footprint and extremely stable contracts:
 
@@ -33,6 +34,8 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **Message:** A generic message implementation.
 
 ### Namotion.Messaging.Json
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
 
 New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`: 
 
@@ -56,6 +59,8 @@ New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`:
 
 ### Namotion.Messaging
 
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
+
 Contains common helper methods and technology independent implementations for the abstractions:
 
 - **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments (i.e. use this implementation when no connection strings are defined).
@@ -68,6 +73,8 @@ Extension methods to enhance or modify instances:
 
 ### Namotion.Messaging.Azure.ServiceBus
 
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.ServiceBus/)
+
 Implementations:
 
 - **ServiceBusMessagePublisher**
@@ -79,6 +86,8 @@ Dependencies:
 
 ### Namotion.Messaging.Azure.EventHub
 
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.EventHub.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.EventHub/)
+
 Implementations:
 
 - **EventHubMessagePublisher**
@@ -89,6 +98,8 @@ Dependencies:
 - [Microsoft.Azure.EventHubs.Processor](https://www.nuget.org/packages/Microsoft.Azure.EventHubs.Processor/)
 
 ### Namotion.Messaging.RabbitMQ
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.RabbitMQ.svg)](https://www.nuget.org/packages/Namotion.Messaging.RabbitMQ/)
 
 Implementations:
 
