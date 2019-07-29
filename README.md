@@ -11,6 +11,10 @@ This enables the following scenarios:
 - Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster execution. 
 - Provide **better local development experiences** (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
 
+## Extensibility
+
+Extensibility - e.g. JSON serialization - is achieved with interceptors by wrapping publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods described below.
+
 ## Core packages
 
 ### Namotion.Messaging.Abstractions
@@ -46,7 +50,7 @@ Send a JSON encoded message:
 
 ```CSharp
 var publisher = ServiceBusMessagePublisher
-    .Create(...)
+    .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
 await publisher.SendJsonAsync(new OrderCreatedMessage { ... });
@@ -56,7 +60,7 @@ Receive JSON encoded messages:
 
 ```CSharp
 var publisher = ServiceBusMessageReceiver
-    .Create(...)
+    .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
 await publisher.ListenJsonAsync(async (messages, ct) => 
@@ -74,15 +78,16 @@ await publisher.ListenJsonAsync(async (messages, ct) =>
 
 The following packages should only be used in the head, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
-|                      | ServiceBus              | EventHub                   | RabbitMQ                   | InMemory                   |
-|----------------------|-------------------------|----------------------------|----------------------------|----------------------------|
-| SendAsync            | Supported               | Supported                  | Supported                  | Supported                  |
-| ListenAsync          | Supported               | Supported                  | Supported                  | Supported                  |
-| GetMessageCountAsync | Not supported           | Not supported              | Supported                  | Supported                  |
-| KeepAliveAsync       | Supported               | Ignored (1.)               | Not supported              | Ignored                    |
-| ConfirmAsync         | Supported               | Ignored (1.)               | Supported                  | Ignored                    |
-| RejectAsync          | Supported               | Ignored (1.)               | Supported                  | Supported                  |
-| DeadLetterAsync      | Supported               | Not supported (2.)         | Not supported (2.)         | Supported                  |
+|                       | ServiceBus     | EventHub            | RabbitMQ            | InMemory   |
+|-----------------------|----------------|---------------------|---------------------|------------|
+| SendAsync             | Supported      | Supported           | Supported           | Supported  |
+| ListenAsync           | Supported      | Supported           | Supported           | Supported  |
+| GetMessageCountAsync  | Not supported  | Not supported       | Supported           | Supported  |
+| KeepAliveAsync        | Supported      | Ignored (1.)        | Not supported       | Ignored    |
+| ConfirmAsync          | Supported      | Ignored (1.)        | Supported           | Ignored    |
+| RejectAsync           | Supported      | Ignored (1.)        | Supported           | Supported  |
+| DeadLetterAsync       | Supported      | Not supported (2.)  | Not supported (2.)  | Supported  |
+| User properties       | Supported      | Supported           | Supported           | Supported  |
 
 1) Because Event Hub is stream based and transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
