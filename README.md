@@ -12,7 +12,7 @@ This enables the following scenarios:
 - Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster execution. 
 - Provide **better local development experiences** (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
 
-## Packages
+## Core packages
 
 ### Namotion.Messaging.Abstractions
 
@@ -27,6 +27,26 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 Contains common helper methods and technology independent implementations for the abstractions:
 
 - **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments (i.e. use this implementation when no connection strings are defined).
+
+Extension methods to enhance or modify instances: 
+
+- **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
+- **WithExceptionHandling\<T>(logger):** Adds automatic exception handling (TODO: Needs improvements).
+- **WithDeadLettering\<T>(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
+
+## Implementation packages
+
+|                      | ServiceBus              | EventHub                   | RabbitMQ                   |
+|----------------------|-------------------------|----------------------------|----------------------------|
+| ListenAsync          | Supported               | Supported                  | Supported                  |
+| GetMessageCountAsync | NotImplementedException | NotImplementedException    | Supported                  |
+| KeepAliveAsync       | Supported               | Ignored 1)                 | NotImplementedException    |
+| ConfirmAsync         | Supported               | Ignored 1)                 | Supported                  |
+| RejectAsync          | Supported               | Ignored 1)                 | Supported                  |
+| DeadLetterAsync      | Supported               | NotImplementedException 2) | NotImplementedException 2) |
+
+1) Because Event Hub is stream based, these method calls are just ignored.
+2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
 
 ### Namotion.Messaging.Azure.ServiceBus
 

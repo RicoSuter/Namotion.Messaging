@@ -75,9 +75,7 @@ namespace Namotion.Messaging.Azure.EventHub
 
         public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            // There is no dead letter queue in Event Hubs
-            _logger.LogWarning("Message has been dead lettered which is not supported by Event Hub.");
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
 
         public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)

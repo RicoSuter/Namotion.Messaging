@@ -13,14 +13,12 @@ namespace Namotion.Messaging.RabbitMQ
         private const string DeliveryTagProperty = "DeliveryTag";
 
         private readonly RabbitConfiguration _configuration;
-        private readonly IMessagePublisher _deadLetterPublisher;
 
         private IModel _channel;
 
-        public RabbitMessageReceiver(RabbitConfiguration configuration, IMessagePublisher deadLetterPublisher = null)
+        public RabbitMessageReceiver(RabbitConfiguration configuration)
         {
             _configuration = configuration;
-            _deadLetterPublisher = deadLetterPublisher;
         }
 
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
@@ -86,11 +84,9 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.CompletedTask;
         }
 
-        public async Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            _ = _deadLetterPublisher ?? throw new InvalidOperationException("Dead letter publisher not specified.");
-
-            await _deadLetterPublisher.SendAsync(new Message[] { message }, cancellationToken).ConfigureAwait(false);
+            throw new NotSupportedException();
         }
 
         public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)

@@ -6,9 +6,24 @@ namespace Namotion.Messaging
 {
     public static class IMessageReceiverExtensions
     {
+        public static IMessageReceiver WithExceptionHandling<T>(this IMessageReceiver<T> messageReceiver, ILogger logger = null)
+        {
+            return new ExceptionHandlingMessageReceiver<T>(messageReceiver, logger);
+        }
+
         public static IMessageReceiver WithExceptionHandling(this IMessageReceiver messageReceiver, ILogger logger = null)
         {
-            return new ExceptionHandlingMessageReceiver(messageReceiver, logger);
+            return new ExceptionHandlingMessageReceiver<object>(messageReceiver, logger);
+        }
+
+        public static IMessageReceiver WithDeadLettering(this IMessageReceiver messageReceiver, IMessagePublisher messagePublisher)
+        {
+            return new DeadLetterQueuePublisherReceiver<object>(messageReceiver, messagePublisher);
+        }
+
+        public static IMessageReceiver WithDeadLettering<T>(this IMessageReceiver<T> messageReceiver, IMessagePublisher<T> messagePublisher)
+        {
+            return new DeadLetterQueuePublisherReceiver<T>(messageReceiver, messagePublisher);
         }
 
         public static IMessageReceiver<T> WithMessageType<T>(this IMessageReceiver messageReceiver)

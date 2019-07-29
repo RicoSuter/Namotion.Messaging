@@ -7,18 +7,19 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Interceptors
 {
-    internal class ExceptionHandlingMessageReceiver : IMessageReceiver
+    internal class ExceptionHandlingMessageReceiver<T> : MessageReceiver<T>
     {
         private readonly IMessageReceiver _messageReceiver;
         private readonly ILogger _logger;
 
         public ExceptionHandlingMessageReceiver(IMessageReceiver messageReceiver, ILogger logger)
+            : base(messageReceiver)
         {
             _messageReceiver = messageReceiver;
             _logger = logger;
         }
 
-        public Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public override Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             return _messageReceiver.ListenAsync(async (messages, ct) =>
             {
@@ -35,31 +36,6 @@ namespace Namotion.Messaging.Interceptors
                     //}
                 }
             }, cancellationToken);
-        }
-
-        public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
-        {
-            return _messageReceiver.ConfirmAsync(messages, cancellationToken);
-        }
-
-        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
-        {
-            return _messageReceiver.DeadLetterAsync(message, reason, errorDescription, cancellationToken);
-        }
-
-        public Task<long> GetMessageCountAsync(CancellationToken cancellationToken)
-        {
-            return _messageReceiver.GetMessageCountAsync(cancellationToken);
-        }
-
-        public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
-        {
-            return _messageReceiver.KeepAliveAsync(message, timeToLive, cancellationToken);
-        }
-
-        public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
-        {
-            return _messageReceiver.RejectAsync(message, cancellationToken);
         }
     }
 }
