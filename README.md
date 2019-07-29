@@ -110,7 +110,7 @@ public static async Task Main(string[] args)
     var host = new HostBuilder()
         .ConfigureServices(services => 
         {
-            var receiver = new ServiceBusMessagePublisher("MyConnectionString", "myqueue");
+            var receiver = new ServiceBusMessageReceiver("MyConnectionString", "myqueue");
             services.AddSingleton<IMessageReceiver>(receiver);
             services.AddHostedService<MyBackgroundService>();
         })
