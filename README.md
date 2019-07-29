@@ -13,7 +13,7 @@ This enables the following scenarios:
 
 ## Extensibility
 
-Extensibility - e.g. JSON serialization - is achieved with interceptors by wrapping publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods described below.
+Extensibility, for example custom dead letter queues or large message handling, is achieved with interceptors which wrap publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods described below. Custom interceptors can easily implemented with the `MessagePublisher<T>` and `MessageReceiver<T>` classes.
 
 ## Core packages
 
