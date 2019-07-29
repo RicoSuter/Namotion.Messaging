@@ -25,6 +25,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
         }
 
+        /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
@@ -41,16 +42,20 @@ namespace Namotion.Messaging.Azure.ServiceBus
             }
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException" />
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public async Task KeepAliveAsync(Abstractions.Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             await _messageReceiver.RenewLockAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(messages.Select(m =>
@@ -59,11 +64,13 @@ namespace Namotion.Messaging.Azure.ServiceBus
             })).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task RejectAsync(Abstractions.Message message, CancellationToken cancellationToken = default)
         {
             await _messageReceiver.AbandonAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task DeadLetterAsync(Abstractions.Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             await _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription).ConfigureAwait(false);

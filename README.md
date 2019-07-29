@@ -48,7 +48,7 @@ Send a JSON encoded message:
 var publisher = new ServiceBusMessagePublisher(...)
     .WithMessageType<OrderCreatedMessage>();
 
-await publisher.SendAsync(new OrderCreatedMessage { ... });
+await publisher.SendJsonAsync(new OrderCreatedMessage { ... });
 ```
 
 Receive JSON encoded messages:
