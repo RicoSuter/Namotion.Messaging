@@ -6,6 +6,9 @@ using RabbitMQ.Client;
 
 namespace Namotion.Messaging.RabbitMQ
 {
+    /// <summary>
+    /// A RabbitMQ message publisher.
+    /// </summary>
     public class RabbitMessagePublisher : IMessagePublisher
     {
         private readonly object _lock = new object();
@@ -14,9 +17,19 @@ namespace Namotion.Messaging.RabbitMQ
         private IConnection _connection;
         private IModel _channel;
 
-        public RabbitMessagePublisher(RabbitConfiguration configuration)
+        private RabbitMessagePublisher(RabbitConfiguration configuration)
         {
             _configuration = configuration;
+        }
+
+        /// <summary>
+        /// Creates a new RabbitMQ message publisher.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns>The message publisher.</returns>
+        public static IMessagePublisher Create(RabbitConfiguration configuration)
+        {
+            return new RabbitMessagePublisher(configuration);
         }
 
         /// <inheritdoc/>

@@ -8,6 +8,9 @@ using Microsoft.Azure.ServiceBus.Core;
 
 namespace Namotion.Messaging.Azure.ServiceBus
 {
+    /// <summary>
+    /// A Service Bus message receiver.
+    /// </summary>
     public class ServiceBusMessageReceiver : Abstractions.IMessageReceiver
     {
         private const string LockTokenProperty = "LockToken";
@@ -15,14 +18,32 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
         private MessageReceiver _messageReceiver;
 
-        public ServiceBusMessageReceiver(string connectionString, string entityPath, ReceiveMode receiveMode = ReceiveMode.PeekLock)
-            : this(new MessageReceiver(connectionString, entityPath, receiveMode))
-        {
-        }
-
-        public ServiceBusMessageReceiver(MessageReceiver messageReceiver)
+        private ServiceBusMessageReceiver(MessageReceiver messageReceiver)
         {
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
+        }
+
+        /// <summary>
+        /// Creates a new Service Bus receiver from a message receiver.
+        /// </summary>
+        /// <param name="messageReceiver">The message receiver.</param>
+        /// <returns>The message publisher.</returns>
+        public static Abstractions.IMessageReceiver CreateFromMessageReceiver(MessageReceiver messageReceiver)
+        {
+            return new ServiceBusMessageReceiver(messageReceiver);
+        }
+
+        /// <summary>
+        /// Creates a new Service Bus receiver from a connection string.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="entityPath">The entity path.</param>
+        /// <param name="receiveMode">The receive mode (default: PeekLock).</param>
+        /// <returns>The message publisher.</returns>
+        public static Abstractions.IMessageReceiver Create(
+            string connectionString, string entityPath, ReceiveMode receiveMode = ReceiveMode.PeekLock)
+        {
+            return new ServiceBusMessageReceiver(new MessageReceiver(connectionString, entityPath, receiveMode));
         }
 
         /// <inheritdoc/>

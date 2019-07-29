@@ -11,34 +11,72 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Namotion.Messaging.Azure.EventHub
 {
+    /// <summary>
+    /// An Event Hub message receiver.
+    /// </summary>
     public class EventHubMessageReceiver : IMessageReceiver
     {
         private readonly EventProcessorHost _host;
         private readonly EventProcessorOptions _processorOptions;
         private readonly ILogger _logger;
 
-        public EventHubMessageReceiver(
+        private EventHubMessageReceiver(EventProcessorHost eventProcessorHost, EventProcessorOptions processorOptions, ILogger logger = null)
+        {
+            _host = eventProcessorHost;
+            _processorOptions = processorOptions;
+            _logger = logger ?? NullLogger.Instance;
+        }
+
+        /// <summary>
+        /// Creates a new Event Hub message receiver from an <see cref="EventProcessorHost"/>.
+        /// </summary>
+        /// <param name="eventProcessorHost">The event processor host.</param>
+        /// <param name="logger">The logger.</param>
+        /// <returns>The message receiver.</returns>
+        public static IMessageReceiver CreateFromEventProcessorHost(
+            EventProcessorHost eventProcessorHost,
+            ILogger logger = null)
+        {
+            return new EventHubMessageReceiver(eventProcessorHost, EventProcessorOptions.DefaultOptions, logger);
+        }
+
+        /// <summary>
+        /// Creates a new Event Hub message receiver from an <see cref="EventProcessorHost"/>.
+        /// </summary>
+        /// <param name="eventProcessorHost">The event processor host.</param>
+        /// <param name="processorOptions">The processor options.</param>
+        /// <param name="logger">The logger.</param>
+        /// <returns>The message receiver.</returns>
+        public static IMessageReceiver CreateFromEventProcessorHost(
+            EventProcessorHost eventProcessorHost, 
+            EventProcessorOptions processorOptions, 
+            ILogger logger = null)
+        {
+            return new EventHubMessageReceiver(eventProcessorHost, processorOptions, logger);
+        }
+
+        /// <summary>
+        /// Creates a new Event Hub message receiver from an <see cref="EventProcessorHost"/>.
+        /// </summary>
+        /// <param name="eventHubPath">The event hub path.</param>
+        /// <param name="consumerGroupName">The consumer group name.</param>
+        /// <param name="eventHubConnectionString">The event hub connection string.</param>
+        /// <param name="storageConnectionString">The stoarge connection string.</param>
+        /// <param name="leaseContainerName">The lease container name.</param>
+        /// <param name="logger">The logger.</param>
+        /// <returns>The message receiver.</returns>
+        public static IMessageReceiver Create(
             string eventHubPath,
             string consumerGroupName,
             string eventHubConnectionString,
             string storageConnectionString,
             string leaseContainerName,
             ILogger logger = null)
-            : this(new EventProcessorHost(eventHubPath, consumerGroupName, eventHubConnectionString, storageConnectionString, leaseContainerName),
-                  EventProcessorOptions.DefaultOptions, logger)
         {
-        }
-
-        public EventHubMessageReceiver(EventProcessorHost eventProcessorHost, ILogger logger = null)
-            : this(eventProcessorHost, EventProcessorOptions.DefaultOptions, logger)
-        {
-        }
-
-        public EventHubMessageReceiver(EventProcessorHost eventProcessorHost, EventProcessorOptions processorOptions, ILogger logger = null)
-        {
-            _host = eventProcessorHost;
-            _processorOptions = processorOptions;
-            _logger = logger ?? NullLogger.Instance;
+            return new EventHubMessageReceiver(
+                new EventProcessorHost(eventHubPath, consumerGroupName, eventHubConnectionString, storageConnectionString, leaseContainerName),
+                EventProcessorOptions.DefaultOptions,
+                logger);
         }
 
         /// <inheritdoc/>

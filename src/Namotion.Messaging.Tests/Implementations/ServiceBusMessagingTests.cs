@@ -1,5 +1,4 @@
 using Xunit;
-using System;
 using Namotion.Messaging.Abstractions;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
@@ -11,13 +10,15 @@ namespace Namotion.Messaging.Tests.Implementations
     {
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
-            return new ServiceBusMessageReceiver(configuration["ServiceBusConnectionString"], "myqueue")
+            return ServiceBusMessageReceiver
+                .Create(configuration["ServiceBusConnectionString"], "myqueue")
                 .WithMessageType<MyMessage>();
         }
 
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
-            return new ServiceBusMessagePublisher(configuration["ServiceBusConnectionString"], "myqueue")
+            return ServiceBusMessagePublisher
+                .Create(configuration["ServiceBusConnectionString"], "myqueue")
                 .WithMessageType<MyMessage>();
         }
 

@@ -8,6 +8,9 @@ using RabbitMQ.Client.Events;
 
 namespace Namotion.Messaging.RabbitMQ
 {
+    /// <summary>
+    /// A RabbitMQ message receiver.
+    /// </summary>
     public class RabbitMessageReceiver : IMessageReceiver
     {
         private const string DeliveryTagProperty = "DeliveryTag";
@@ -16,9 +19,19 @@ namespace Namotion.Messaging.RabbitMQ
 
         private IModel _channel;
 
-        public RabbitMessageReceiver(RabbitConfiguration configuration)
+        private RabbitMessageReceiver(RabbitConfiguration configuration)
         {
             _configuration = configuration;
+        }
+
+        /// <summary>
+        /// Creates a new RabbitMQ message receiver.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns>The message receiver.</returns>
+        public static IMessageReceiver Create(RabbitConfiguration configuration)
+        {
+            return new RabbitMessageReceiver(configuration);
         }
 
         /// <inheritdoc/>

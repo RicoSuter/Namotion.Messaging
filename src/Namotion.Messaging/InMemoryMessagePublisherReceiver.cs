@@ -20,9 +20,27 @@ namespace Namotion.Messaging
         private Dictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken> funcs =
             new Dictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken>();
 
-        public InMemoryMessagePublisherReceiver(bool awaitProcessing = false)
+        private InMemoryMessagePublisherReceiver(bool awaitProcessing)
         {
             _awaitProcessing = awaitProcessing;
+        }
+
+        /// <summary>
+        /// Creates a new in-memory message publisher and receiver which sends messages without blocking.
+        /// </summary>
+        /// <returns>The publisher and receiver.</returns>
+        public static InMemoryMessagePublisherReceiver Create()
+        {
+            return new InMemoryMessagePublisherReceiver(false);
+        }
+
+        /// <summary>
+        /// Creates a new in-memory message publisher and receiver which sends messages with blocking.
+        /// </summary>
+        /// <returns>The publisher and receiver.</returns>
+        public static InMemoryMessagePublisherReceiver CreateWithMessageBlocking()
+        {
+            return new InMemoryMessagePublisherReceiver(true);
         }
 
         /// <summary>

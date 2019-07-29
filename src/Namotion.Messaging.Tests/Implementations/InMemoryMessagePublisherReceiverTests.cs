@@ -9,7 +9,7 @@ namespace Namotion.Messaging.Tests.Implementations
 
         public InMemoryMessagePublisherReceiverTests()
         {
-            _publisherReceiver = new InMemoryMessagePublisherReceiver();
+            _publisherReceiver = InMemoryMessagePublisherReceiver.Create();
         }
 
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)

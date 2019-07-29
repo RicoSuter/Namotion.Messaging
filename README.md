@@ -45,7 +45,8 @@ New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`:
 Send a JSON encoded message: 
 
 ```CSharp
-var publisher = new ServiceBusMessagePublisher(...)
+var publisher = ServiceBusMessagePublisher
+    .Create(...)
     .WithMessageType<OrderCreatedMessage>();
 
 await publisher.SendJsonAsync(new OrderCreatedMessage { ... });
@@ -54,7 +55,8 @@ await publisher.SendJsonAsync(new OrderCreatedMessage { ... });
 Receive JSON encoded messages:
 
 ```CSharp
-var publisher = new ServiceBusMessageReceiver(...)
+var publisher = ServiceBusMessageReceiver
+    .Create(...)
     .WithMessageType<OrderCreatedMessage>();
 
 await publisher.ListenJsonAsync(async (messages, ct) => 
@@ -178,7 +180,7 @@ public static async Task Main(string[] args)
     var host = new HostBuilder()
         .ConfigureServices(services => 
         {
-            var receiver = new ServiceBusMessageReceiver("MyConnectionString", "myqueue");
+            var receiver = ServiceBusMessageReceiver.Create("MyConnectionString", "myqueue");
             services.AddSingleton<IMessageReceiver>(receiver);
             services.AddHostedService<MyBackgroundService>();
         })

@@ -7,20 +7,40 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Azure.EventHub
 {
+    /// <summary>
+    /// An Event Hub publisher.
+    /// </summary>
     public class EventHubMessagePublisher : IMessagePublisher
     {
         private readonly EventHubClient _client;
         private readonly long _maxMessageSize;
 
-        public EventHubMessagePublisher(string connectionString, long maxMessageSize = 262144)
-            : this(EventHubClient.CreateFromConnectionString(connectionString))
+        private EventHubMessagePublisher(EventHubClient client, long maxMessageSize)
         {
+            _client = client;
             _maxMessageSize = maxMessageSize;
         }
 
-        public EventHubMessagePublisher(EventHubClient client)
+        /// <summary>
+        /// Creates a new Event Hub publisher with a client.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="maxMessageSize">The maximum message size.</param>
+        /// <returns>The message publisher.</returns>
+        public static IMessagePublisher CreateFromEventHubClient(EventHubClient client, long maxMessageSize = 262144)
         {
-            _client = client;
+            return new EventHubMessagePublisher(client, maxMessageSize);
+        }
+
+        /// <summary>
+        /// Creates a new Event Hub publisher from a connection string.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="maxMessageSize">The maximum message size.</param>
+        /// <returns>The message publisher.</returns>
+        public static IMessagePublisher Create(string connectionString, long maxMessageSize = 262144)
+        {
+            return new EventHubMessagePublisher(EventHubClient.CreateFromConnectionString(connectionString), maxMessageSize);
         }
 
         /// <inheritdoc/>
