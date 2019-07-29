@@ -11,9 +11,9 @@ This enables the following scenarios:
 - Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster execution. 
 - Provide **better local development experiences** (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
 
-## Extensibility
+## Extensions
 
-Extensibility, for example custom dead letter queues or large message handling, is achieved with interceptors which wrap publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods described below. Custom interceptors can easily implemented with the `MessagePublisher<T>` and `MessageReceiver<T>` classes.
+Behavior extensions, for example custom dead letter queues or large message handling, is achieved with interceptors which wrap publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods. Custom interceptors can be implemented with the `MessagePublisher<T>` and `MessageReceiver<T>` classes.
 
 ## Usage
 
