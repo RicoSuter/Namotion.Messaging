@@ -59,7 +59,7 @@ namespace Namotion.Messaging.Abstractions
         Task RejectAsync(Message message, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Moves a message to the dead letter queue.
+        /// Removes the message and moves it to the dead letter queue.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="reason">The reason.</param>
