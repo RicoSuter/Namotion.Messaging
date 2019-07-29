@@ -31,8 +31,8 @@ Contains common helper methods and technology independent implementations for th
 Extension methods to enhance or modify instances: 
 
 - **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
-- **WithExceptionHandling\<T>(logger):** Adds automatic exception handling (TODO: Needs improvements).
-- **WithDeadLettering\<T>(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
+- **WithExceptionHandling(logger):** Adds automatic exception handling (TODO: Needs improvements).
+- **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
 
 ### Namotion.Messaging.Json
 
@@ -90,7 +90,7 @@ Dependencies:
 
 ## Usage
 
-To use the `IMessageReceiver` in a simple command line application, implement the a new `BackgroundService` and start message processing in `ExecuteAsync`:
+To use the `IMessageReceiver` in a simple command line application, implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
 
 ```CSharp
 public class MyBackgroundService : BackgroundService
