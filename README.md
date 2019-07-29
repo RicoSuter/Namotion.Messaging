@@ -15,6 +15,45 @@ This enables the following scenarios:
 
 Extensibility, for example custom dead letter queues or large message handling, is achieved with interceptors which wrap publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods described below. Custom interceptors can easily implemented with the `MessagePublisher<T>` and `MessageReceiver<T>` classes.
 
+## Usage
+
+To use the `IMessageReceiver` in a simple command line application, implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
+
+```CSharp
+public class MyBackgroundService : BackgroundService
+{
+    private IMessageReceiver _messageReceiver;
+
+    public MyBackgroundService(IMessageReceiver messageReceiver)
+    {
+        _messageReceiver = messageReceiver;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await _messageReceiver.ListenAsync(stoppingToken);
+    }
+}
+```
+
+In your program's `Main` method, create a new `HostBuilder` and add the background service as a hosted service:
+
+```CSharp
+public static async Task Main(string[] args)
+{
+    var host = new HostBuilder()
+        .ConfigureServices(services => 
+        {
+            var receiver = ServiceBusMessageReceiver.Create("MyConnectionString", "myqueue");
+            services.AddSingleton<IMessageReceiver>(receiver);
+            services.AddHostedService<MyBackgroundService>();
+        })
+        .Build();
+
+    await host.RunAsync();
+}
+```
+
 ## Core packages
 
 ### Namotion.Messaging.Abstractions
@@ -155,42 +194,3 @@ Behavior:
 Dependencies: 
 
 - [RabbitMQ.Client](https://www.nuget.org/packages/RabbitMQ.Client)
-
-## Usage
-
-To use the `IMessageReceiver` in a simple command line application, implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
-
-```CSharp
-public class MyBackgroundService : BackgroundService
-{
-    private IMessageReceiver _messageReceiver;
-
-    public MyBackgroundService(IMessageReceiver messageReceiver)
-    {
-        _messageReceiver = messageReceiver;
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        await _messageReceiver.ListenAsync(stoppingToken);
-    }
-}
-```
-
-In your program's `Main` method, create a new `HostBuilder` and add the background service as a hosted service:
-
-```CSharp
-public static async Task Main(string[] args)
-{
-    var host = new HostBuilder()
-        .ConfigureServices(services => 
-        {
-            var receiver = ServiceBusMessageReceiver.Create("MyConnectionString", "myqueue");
-            services.AddSingleton<IMessageReceiver>(receiver);
-            services.AddHostedService<MyBackgroundService>();
-        })
-        .Build();
-
-    await host.RunAsync();
-}
-```
