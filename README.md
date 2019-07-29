@@ -34,16 +34,23 @@ Extension methods to enhance or modify instances:
 - **WithExceptionHandling\<T>(logger):** Adds automatic exception handling (TODO: Needs improvements).
 - **WithDeadLettering\<T>(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
 
+### Namotion.Messaging.Json
+
+New extension methods: 
+
+- **SendJsonAsync(...)**
+- **ListenJsonAsync(...)**
+
 ## Implementation packages
 
 |                      | ServiceBus              | EventHub                   | RabbitMQ                   |
 |----------------------|-------------------------|----------------------------|----------------------------|
 | ListenAsync          | Supported               | Supported                  | Supported                  |
-| GetMessageCountAsync | NotImplementedException | NotImplementedException    | Supported                  |
-| KeepAliveAsync       | Supported               | Ignored 1)                 | NotImplementedException    |
-| ConfirmAsync         | Supported               | Ignored 1)                 | Supported                  |
-| RejectAsync          | Supported               | Ignored 1)                 | Supported                  |
-| DeadLetterAsync      | Supported               | NotImplementedException 2) | NotImplementedException 2) |
+| GetMessageCountAsync | Not supported           | Not supported              | Supported                  |
+| KeepAliveAsync       | Supported               | Ignored (1.)               | Not supported              |
+| ConfirmAsync         | Supported               | Ignored (1.)               | Supported                  |
+| RejectAsync          | Supported               | Ignored (1.)               | Supported                  |
+| DeadLetterAsync      | Supported               | Not supported (2.)         | Not supported (2.)         |
 
 1) Because Event Hub is stream based, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.

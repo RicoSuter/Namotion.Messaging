@@ -57,7 +57,7 @@ namespace Namotion.Messaging.Azure.EventHub
 
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ namespace Namotion.Messaging.Azure.EventHub
 
         public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)

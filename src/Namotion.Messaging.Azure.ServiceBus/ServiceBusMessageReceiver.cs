@@ -43,7 +43,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public async Task KeepAliveAsync(Abstractions.Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
