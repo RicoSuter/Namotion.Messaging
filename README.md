@@ -117,19 +117,20 @@ await publisher.ListenJsonAsync(async (messages, ct) =>
 
 The following packages should only be used in the head project, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
-|                       | ServiceBus     | EventHub            | RabbitMQ            | InMemory   |
-|-----------------------|----------------|---------------------|---------------------|------------|
-| SendAsync             | Supported      | Supported           | Supported           | Supported  |
-| ListenAsync           | Supported      | Supported           | Supported           | Supported  |
-| GetMessageCountAsync  | Not supported  | Not supported       | Supported           | Supported  |
-| KeepAliveAsync        | Supported      | Ignored (1.)        | Not supported       | Ignored    |
-| ConfirmAsync          | Supported      | Ignored (1.)        | Supported           | Ignored    |
-| RejectAsync           | Supported      | Ignored (1.)        | Supported           | Supported  |
-| DeadLetterAsync       | Supported      | Not supported (2.)  | Not supported (2.)  | Supported  |
-| User properties       | Supported      | Supported           | Supported           | Supported  |
+|                       | ServiceBus     | EventHub            | RabbitMQ            | AzureStorageQueue   | InMemory   |
+|-----------------------|----------------|---------------------|---------------------|---------------------|------------|
+| SendAsync             | Supported      | Supported           | Supported           | Supported           | Supported  |
+| ListenAsync           | Supported      | Supported           | Supported           | Supported           | Supported  |
+| GetMessageCountAsync  | Not supported  | Not supported       | Supported           | Supported           | Supported  |
+| KeepAliveAsync        | Supported      | Ignored (1.)        | Not supported       | Supported           | Ignored    |
+| ConfirmAsync          | Supported      | Ignored (1.)        | Supported           | Supported           | Ignored    |
+| RejectAsync           | Supported      | Ignored (1.)        | Supported           | Supported           | Supported  |
+| DeadLetterAsync       | Supported      | Not supported (2.)  | Not supported (2.)  | Not supported (2.)  | Supported  |
+| User properties       | Supported      | Supported           | Supported           | Not supported (3.)  | Supported  |
 
 1) Because Event Hub is stream based and transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
+3) Use `receiver.WithPropertiesInContent(publisher)` to enable user properties support (not implemented yet).
 
 ### Namotion.Messaging
 
