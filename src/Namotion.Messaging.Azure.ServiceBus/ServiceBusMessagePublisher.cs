@@ -17,11 +17,13 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _queueClient = new QueueClient(connectionString, entityPath);
         }
 
+        /// <inheritdoc/>
         public async Task SendAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
             await _queueClient.SendAsync(messages.Select(m => CreateMessage(m)).ToList());
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             _queueClient.CloseAsync().GetAwaiter().GetResult();

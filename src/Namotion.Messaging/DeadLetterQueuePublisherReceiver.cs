@@ -2,13 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging.Interceptors
+namespace Namotion.Messaging
 {
     internal class DeadLetterQueuePublisherReceiver<T> : MessageReceiver<T>
     {
         private readonly IMessagePublisher _messagePublisher;
 
-        public DeadLetterQueuePublisherReceiver(IMessageReceiver messageReceiver, IMessagePublisher messagePublisher) 
+        public DeadLetterQueuePublisherReceiver(IMessageReceiver messageReceiver, IMessagePublisher messagePublisher)
             : base(messageReceiver)
         {
             _messagePublisher = messagePublisher;

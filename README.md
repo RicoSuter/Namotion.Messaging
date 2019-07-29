@@ -96,7 +96,6 @@ Contains common helper methods and technology independent implementations for th
 Extension methods to enhance or modify instances: 
 
 - **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
-- **WithExceptionHandling(logger):** Adds automatic exception handling (TODO: Needs improvements).
 - **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
 
 ### Namotion.Messaging.Azure.ServiceBus
@@ -107,6 +106,10 @@ Implementations:
 
 - **ServiceBusMessagePublisher**
 - **ServiceBusMessageReceiver**
+
+Behavior: 
+
+- When `handleMessages` throws an exception, then the message is abandoned and later reprocessed until it is moved to the dead letter queue.
 
 Dependencies: 
 
@@ -121,6 +124,10 @@ Implementations:
 - **EventHubMessagePublisher**
 - **EventHubMessageReceiver**
 
+Behavior: 
+
+- Exceptions from `handleMessages` are logged and then ignored, i.e. the processing moves forward in the partition.
+
 Dependencies: 
 
 - [Microsoft.Azure.EventHubs.Processor](https://www.nuget.org/packages/Microsoft.Azure.EventHubs.Processor/)
@@ -133,6 +140,10 @@ Implementations:
 
 - **RabbitMessagePublisher**
 - **RabbitMessageReceiver**
+
+Behavior: 
+
+- When `handleMessages` throws an exception, then the message is rejected and later reprocessed.
 
 Dependencies: 
 

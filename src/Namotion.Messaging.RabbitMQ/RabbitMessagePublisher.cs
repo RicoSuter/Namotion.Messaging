@@ -19,6 +19,7 @@ namespace Namotion.Messaging.RabbitMQ
             _configuration = configuration;
         }
 
+        /// <inheritdoc/>
         public Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             if (_connection == null)
@@ -56,6 +57,7 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             _channel?.Dispose();

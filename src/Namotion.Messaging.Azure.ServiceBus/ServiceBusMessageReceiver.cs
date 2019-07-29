@@ -32,8 +32,18 @@ namespace Namotion.Messaging.Azure.ServiceBus
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var message = await _messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-                    await handleMessages(new Abstractions.Message[] { ToMessage(message) }, cancellationToken).ConfigureAwait(false);
+                    var message = ConvertToMessage(await _messageReceiver
+                        .ReceiveAsync(TimeSpan.FromSeconds(1))
+                        .ConfigureAwait(false));
+
+                    try
+                    {
+                        await handleMessages(new Abstractions.Message[] { message }, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        await RejectAsync(message, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
             finally
@@ -76,7 +86,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             await _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription).ConfigureAwait(false);
         }
 
-        private Abstractions.Message ToMessage(Message message)
+        private Abstractions.Message ConvertToMessage(Message message)
         {
             return new Abstractions.Message(
                 id: message.MessageId,

@@ -23,6 +23,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _client = client;
         }
 
+        /// <inheritdoc/>
         public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(messages
@@ -64,6 +65,12 @@ namespace Namotion.Messaging.Azure.EventHub
                 }))).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            _client.Close();
+        }
+
         private static EventData CreateEventData(Message message)
         {
             var eventData = new EventData(message.Content);
@@ -74,11 +81,6 @@ namespace Namotion.Messaging.Azure.EventHub
             }
 
             return eventData;
-        }
-
-        public void Dispose()
-        {
-            _client.Close();
         }
     }
 }

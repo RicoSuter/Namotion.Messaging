@@ -41,6 +41,7 @@ namespace Namotion.Messaging.Azure.EventHub
             _logger = logger ?? NullLogger.Instance;
         }
 
+        /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
@@ -55,17 +56,21 @@ namespace Namotion.Messaging.Azure.EventHub
             }
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException" />
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             // There is no message confirmation in Event Hubs, only checkpointing after processing
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
         {
             // There is no message rejection in Event Hubs
@@ -73,11 +78,14 @@ namespace Namotion.Messaging.Azure.EventHub
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException" />
         public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             // Keep alive is not needed as there is no timeout in Event Hubs
@@ -160,16 +168,23 @@ namespace Namotion.Messaging.Azure.EventHub
                     { "EventHub.Batch.EndOffset", messages.Last().SystemProperties[OffsetProperty] },
                 }))
                 {
-                    await _handleMessages(messages.Select(m => new Message(
-                        id: m.SystemProperties.PartitionKey + "-" + m.SystemProperties.SequenceNumber,
-                        content: m.Body.Array,
-                        partitionId: context.PartitionId,
-                        properties: m.Properties.ToDictionary(p => p.Key, p => p.Value),
-                        systemProperties: m.SystemProperties.ToDictionary(p => p.Key, p => p.Value))
-                    ).ToArray(), _cancellationToken);
+                    try
+                    {
+                        await _handleMessages(messages.Select(m => new Message(
+                            id: m.SystemProperties.PartitionKey + "-" + m.SystemProperties.SequenceNumber,
+                            content: m.Body.Array,
+                            partitionId: context.PartitionId,
+                            properties: m.Properties.ToDictionary(p => p.Key, p => p.Value),
+                            systemProperties: m.SystemProperties.ToDictionary(p => p.Key, p => p.Value))
+                        ).ToArray(), _cancellationToken);
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.LogError(exception, "An unexpected error occurred in the message handler.");
+                    }
 
                     _cancellationToken.ThrowIfCancellationRequested();
-                    await context.CheckpointAsync();
+                    await context.CheckpointAsync().ConfigureAwait(false);
                 }
             }
 

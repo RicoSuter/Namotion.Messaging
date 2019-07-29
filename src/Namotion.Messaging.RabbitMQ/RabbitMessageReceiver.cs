@@ -21,6 +21,7 @@ namespace Namotion.Messaging.RabbitMQ
             _configuration = configuration;
         }
 
+        /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             var factory = new ConnectionFactory
@@ -50,7 +51,14 @@ namespace Namotion.Messaging.RabbitMQ
                         }
                     );
 
-                    await handleMessages(new Message[] { message }, cancellationToken);
+                    try
+                    {
+                        await handleMessages(new Message[] { message }, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        await RejectAsync(message, cancellationToken).ConfigureAwait(false);
+                    }
                 };
 
                 _channel.BasicConsume(_configuration.QueueName, _configuration.AutoAck, consumer);
@@ -59,11 +67,13 @@ namespace Namotion.Messaging.RabbitMQ
             }
         }
 
+        /// <inheritdoc/>
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult<long>(_channel.MessageCount(_configuration.QueueName));
         }
 
+        /// <inheritdoc/>
         public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
@@ -76,6 +86,7 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
         {
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
@@ -84,11 +95,15 @@ namespace Namotion.Messaging.RabbitMQ
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException" />
         public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException" />
         public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
