@@ -10,7 +10,12 @@ namespace Namotion.Messaging.Abstractions
         /// <summary>
         /// Creates an instance of <see cref="Message{T}"/>.
         /// </summary>
+        /// <param name="id">The message ID.</param>
         /// <param name="content">The message content.</param>
+        /// <param name="deserializedObject">The deserialized object.</param>
+        /// <param name="properties">The message user properties.</param>
+        /// <param name="systemProperties">The message system properties.</param>
+        /// <param name="partitionId">The partition ID.</param>
         public Message(
             string id = null,
             byte[] content = null,
@@ -46,7 +51,11 @@ namespace Namotion.Messaging.Abstractions
         /// <summary>
         /// Creates an instance of <see cref="Message"/>.
         /// </summary>
+        /// <param name="id">The message Id.</param>
         /// <param name="content">The message content.</param>
+        /// <param name="properties">The message user properties.</param>
+        /// <param name="systemProperties">The message system properties.</param>
+        /// <param name="partitionId">The partition ID.</param>
         public Message(
             string id = null,
             byte[] content = null,

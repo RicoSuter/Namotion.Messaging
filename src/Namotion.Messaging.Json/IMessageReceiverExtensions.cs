@@ -46,8 +46,8 @@ namespace Namotion.Messaging.Json
             }
             catch
             {
-                deserializedObject = default;
                 // TODO: What to do here?
+                deserializedObject = default;
             }
 
             return new Message<T>(

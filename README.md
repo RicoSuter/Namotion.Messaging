@@ -115,7 +115,7 @@ await publisher.ListenJsonAsync(async (messages, ct) =>
 
 ## Implementation packages
 
-The following packages should only be used in the head, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
+The following packages should only be used in the head project, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
 |                       | ServiceBus     | EventHub            | RabbitMQ            | InMemory   |
 |-----------------------|----------------|---------------------|---------------------|------------|
