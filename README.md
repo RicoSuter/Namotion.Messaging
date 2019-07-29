@@ -40,7 +40,7 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`: 
 
 - **SendJsonAsync(...):** Sends messages of type T which are serialized to JSON to the queue.
-- **ListenJsonAsync(...):** Receives messages and deserializes their content using the JSON serializer to the `Message<T>.Object` property.
+- **ListenJsonAsync(...):** Receives messages and deserializes their content using the JSON serializer to the `Message<T>.Object` property. If the content could not be deserialized then `Object` is `null`.
 
 Send a JSON encoded message: 
 
@@ -82,7 +82,7 @@ The following packages should only be used in the head, i.e. directly in your ap
 | RejectAsync          | Supported               | Ignored (1.)               | Supported                  | Supported                  |
 | DeadLetterAsync      | Supported               | Not supported (2.)         | Not supported (2.)         | Supported                  |
 
-1) Because Event Hub is stream based, these method calls are just ignored.
+1) Because Event Hub is stream based and transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
 
 ### Namotion.Messaging
