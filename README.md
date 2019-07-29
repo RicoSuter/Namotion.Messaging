@@ -13,7 +13,9 @@ This enables the following scenarios:
 
 ## Core packages
 
-### Namotion.Messaging.Abstractions [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Abstractions.svg)](https://www.nuget.org/packages/Namotion.Messaging.Abstractions/)
+### Namotion.Messaging.Abstractions
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Abstractions.svg)](https://www.nuget.org/packages/Namotion.Messaging.Abstractions/)
 
 Contains the messaging abstractions, mainly interfaces with a very small footprint and extremely stable contracts:
 
@@ -31,14 +33,44 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **Message\<T>:**
 - **Message:** A generic message implementation.
 
-### Namotion.Messaging.Json [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
+### Namotion.Messaging.Json
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
 
 New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`: 
 
-- **SendJsonAsync(...)**
-- **ListenJsonAsync(...)**
+- **SendJsonAsync(...):** Sends messages of type T which are serialized to JSON to the queue.
+- **ListenJsonAsync(...):** Receives messages and deserializes their content using the JSON serializer to the `Message<T>.Object` property.
+
+Send a JSON encoded message: 
+
+```CSharp
+var publisher = new ServiceBusMessagePublisher(...)
+    .WithMessageType<OrderCreatedMessage>();
+
+await publisher.SendAsync(new OrderCreatedMessage { ... });
+```
+
+Receive JSON encoded messages:
+
+```CSharp
+var publisher = new ServiceBusMessageReceiver(...)
+    .WithMessageType<OrderCreatedMessage>();
+
+await publisher.ListenJsonAsync(async (messages, ct) => 
+{
+    foreach (OrderCreatedMessage message in messages.Select(m => m.Object))
+	{
+		...
+	}
+
+	await publisher.ConfirmAsync(messages, ct);
+});
+```
 
 ## Implementation packages
+
+The following packages should only be used in the head, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
 |                      | ServiceBus              | EventHub                   | RabbitMQ                   | InMemory                   |
 |----------------------|-------------------------|----------------------------|----------------------------|----------------------------|
@@ -53,7 +85,9 @@ New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`:
 1) Because Event Hub is stream based, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
 
-### Namotion.Messaging [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
+### Namotion.Messaging
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
 
 Contains common helper methods and technology independent implementations for the abstractions:
 
@@ -65,7 +99,9 @@ Extension methods to enhance or modify instances:
 - **WithExceptionHandling(logger):** Adds automatic exception handling (TODO: Needs improvements).
 - **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
 
-### Namotion.Messaging.Azure.ServiceBus [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.ServiceBus/)
+### Namotion.Messaging.Azure.ServiceBus
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.ServiceBus/)
 
 Implementations:
 
@@ -76,7 +112,9 @@ Dependencies:
 
 - [Microsoft.Azure.ServiceBus](https://www.nuget.org/packages/Microsoft.Azure.ServiceBus/)
 
-### Namotion.Messaging.Azure.EventHub [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.EventHub.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.EventHub/)
+### Namotion.Messaging.Azure.EventHub
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.EventHub.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.EventHub/)
 
 Implementations:
 
@@ -87,7 +125,9 @@ Dependencies:
 
 - [Microsoft.Azure.EventHubs.Processor](https://www.nuget.org/packages/Microsoft.Azure.EventHubs.Processor/)
 
-### Namotion.Messaging.RabbitMQ [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.RabbitMQ.svg)](https://www.nuget.org/packages/Namotion.Messaging.RabbitMQ/)
+### Namotion.Messaging.RabbitMQ
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.RabbitMQ.svg)](https://www.nuget.org/packages/Namotion.Messaging.RabbitMQ/)
 
 Implementations:
 
