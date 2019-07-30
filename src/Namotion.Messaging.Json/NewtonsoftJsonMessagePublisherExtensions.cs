@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging.Json
+namespace Namotion.Messaging
 {
     /// <summary>
     /// JSON serialization extension methods.
     /// </summary>
-    public static class IMessagePublisherExtensions
+    public static class NewtonsoftJsonMessagePublisherExtensions
     {
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {

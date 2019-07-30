@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging.Json
+namespace Namotion.Messaging
 {
     /// <summary>
     /// <see cref="IMessageReceiver"/> extension methods.
     /// </summary>
-    public static class IMessageReceiverExtensions
+    public static class NewtonsoftJsonMessageReceiverExtensions
     {
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
