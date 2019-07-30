@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.1.5</Version>
+    <Version>0.2.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>Namotion</Company>
     <Authors>Rico Suter</Authors>
@@ -9,7 +9,9 @@
     <PackageIconUrl>https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>.NET library with message queue abstractions.</Description>
+    <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Messaging</PackageProjectUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="3.0.0" />
