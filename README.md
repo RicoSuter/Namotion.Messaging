@@ -130,13 +130,13 @@ The following packages should only be used in the head project, i.e. directly in
 
 1) Because Event Hub is stream based and transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
-3) Use `receiver.WithPropertiesInContent(publisher)` to enable user properties support (not implemented yet).
+3) Use `receiver.WithPropertiesInContent()` to enable user properties support (not implemented yet).
 
 ### Namotion.Messaging
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
 
-Contains common helper methods and technology independent implementations for the abstractions:
+Contains common helper methods and base implementations of the abstractions:
 
 - **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments (i.e. use this implementation when no connection strings are defined).
 
