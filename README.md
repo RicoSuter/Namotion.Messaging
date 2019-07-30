@@ -9,7 +9,7 @@ By programming against a messaging abstraction you enable the following scenario
 - Build **multi-cloud capable applications** by being able to change messaging technologies on demand. 
 - Quickly **switch to different messaging technologies** to find the best technological fit for your applications. 
 - Implement behavior driven **integration tests which can run in-memory** or against different technologies for better debugging experiences or local execution. 
-- Provide **better local development experiences**, for example replace the Service Bus usage with a locally running RabbitMQ docker container or an in-memory implementation. 
+- Provide **better local development experiences**, e.g. replace Service Bus with a locally running RabbitMQ docker container or an in-memory implementation. 
 
 ## Usage
 
@@ -76,10 +76,10 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **IMessageReceiver**
     - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
     - `ListenAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
-    - `KeepAliveAsync(messages, timeToLive, cancellationToken)`: Extends the message lock timeout on the given message.
+    - `KeepAliveAsync(messages, timeToLive, cancellationToken)`: Extends the message lock timeout on the given messages.
     - `ConfirmAsync(messages, cancellationToken)`: Confirms the processing of messages and removes them from the queue.
-    - `RejectAsync(messages, cancellationToken)`: Rejects a message and requeues it for later reprocessing.
-    - `DeadLetterAsync(messages, reason, errorDescription, cancellationToken)`: Removes the message and moves it to the dead letter queue.
+    - `RejectAsync(messages, cancellationToken)`: Rejects messages and requeues them for later reprocessing.
+    - `DeadLetterAsync(messages, reason, errorDescription, cancellationToken)`: Removes the messages and moves them to the dead letter queue.
 - **Message\<T>:**
 - **Message:** A generic message implementation.
 
@@ -87,10 +87,10 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
 
-New extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>`: 
+Provides extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>` to enable JSON serialization for messages: 
 
-- **SendJsonAsync(...):** Sends messages of type T which are serialized to JSON to the queue.
-- **ListenJsonAsync(...):** Receives messages and deserializes their content using the JSON serializer to the `Message<T>.Object` property. If the content could not be deserialized then `Object` is `null`.
+- **SendAsJsonAsync(...):** Sends messages of type T which are serialized to JSON to the queue.
+- **ListenAndDeserializeJsonAsync(...):** Receives messages and deserializes their content using the JSON serializer to the `Message<T>.Object` property. If the content could not be deserialized then `Object` is `null`.
 
 Send a JSON encoded message: 
 
@@ -99,7 +99,7 @@ var publisher = ServiceBusMessagePublisher
     .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
-await publisher.SendJsonAsync(new OrderCreatedMessage { ... });
+await publisher.SendAsJsonAsync(new OrderCreatedMessage { ... });
 ```
 
 Receive JSON encoded messages:
@@ -109,7 +109,7 @@ var publisher = ServiceBusMessageReceiver
     .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
-await publisher.ListenJsonAsync(async (messages, ct) => 
+await publisher.ListenAndDeserializeJsonAsync(async (messages, ct) => 
 {
     foreach (OrderCreatedMessage message in messages.Select(m => m.Object))
     {
@@ -135,7 +135,7 @@ The following packages should only be used in the head project, i.e. directly in
 | DeadLetterAsync       | :heavy_check_mark:      | :x: (2.)                  | :x: (2.)                  | :x: (2.)            | :heavy_check_mark:  |
 | User properties       | :heavy_check_mark:      | :heavy_check_mark:        | :x: (3.)                  | :heavy_check_mark:  | :heavy_check_mark:  |
 
-1) Because Event Hub is stream based and transactional, these method calls are just ignored.
+1) Because Event Hub is stream based and not transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
 3) Use `receiver.WithPropertiesInContent()` to enable user properties support (not implemented yet).
 

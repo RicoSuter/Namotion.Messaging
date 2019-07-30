@@ -82,7 +82,7 @@ namespace Namotion.Messaging.Tests
 
             var listenCancellation = new CancellationTokenSource();
             var receiveCancellation = new CancellationTokenSource();
-            var task = receiver.ListenJsonAsync(async (msgs, ct) =>
+            var task = receiver.ListenAndDeserializeJsonAsync(async (msgs, ct) =>
             {
                 foreach (var message in msgs
                     .Where(message => message.Object?.Id == orderId))
@@ -99,7 +99,7 @@ namespace Namotion.Messaging.Tests
             }, listenCancellation.Token);
 
             var stopwatch = Stopwatch.StartNew();
-            await publisher.SendJsonAsync(Enumerable.Range(1, count)
+            await publisher.SendAsJsonAsync(Enumerable.Range(1, count)
                 .Select(i => new MyMessage { Id = orderId })
                 .ToList());
 

@@ -28,7 +28,7 @@ namespace Namotion.Messaging.Json
         /// <param name="handleMessages">The message handler callback.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task ListenJsonAsync<T>(
+        public static Task ListenAndDeserializeJsonAsync<T>(
             this IMessageReceiver<T> messageReceiver,
             Func<IReadOnlyCollection<Message<T>>, CancellationToken, Task> handleMessages,
             CancellationToken cancellationToken = default)

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Json
 {
+    /// <summary>
+    /// JSON serialization extension methods.
+    /// </summary>
     public static class IMessagePublisherExtensions
     {
         private static readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
@@ -23,7 +26,7 @@ namespace Namotion.Messaging.Json
         /// <param name="message">The message.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task SendJsonAsync<T>(this IMessagePublisher<T> messagePublisher, T message, CancellationToken cancellationToken = default)
+        public static Task SendAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, T message, CancellationToken cancellationToken = default)
         {
             return messagePublisher.SendAsync(ConvertToMessage(message), cancellationToken);
         }
@@ -35,7 +38,7 @@ namespace Namotion.Messaging.Json
         /// <param name="messages">The messages.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task SendJsonAsync<T>(this IMessagePublisher<T> messagePublisher, IEnumerable<T> messages, CancellationToken cancellationToken = default)
+        public static Task SendAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, IEnumerable<T> messages, CancellationToken cancellationToken = default)
         {
             return messagePublisher.SendAsync(messages.Select(ConvertToMessage), cancellationToken);
         }
