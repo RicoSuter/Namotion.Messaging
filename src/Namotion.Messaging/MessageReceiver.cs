@@ -36,9 +36,9 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public virtual Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public virtual Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.DeadLetterAsync(message, reason, errorDescription, cancellationToken);
+            return _messageReceiver.DeadLetterAsync(messages, reason, errorDescription, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -48,15 +48,15 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public virtual Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public virtual Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.KeepAliveAsync(message, timeToLive, cancellationToken);
+            return _messageReceiver.KeepAliveAsync(messages, timeToLive, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public virtual Task RejectAsync(Message message, CancellationToken cancellationToken = default)
+        public virtual Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.RejectAsync(message, cancellationToken);
+            return _messageReceiver.RejectAsync(messages, cancellationToken);
         }
     }
 }

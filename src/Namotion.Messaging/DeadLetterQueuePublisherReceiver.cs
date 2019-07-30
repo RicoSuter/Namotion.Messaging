@@ -1,4 +1,5 @@
 ﻿using Namotion.Messaging.Abstractions;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,11 +15,10 @@ namespace Namotion.Messaging
             _messagePublisher = messagePublisher;
         }
 
-        public async override Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public async override Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            // TODO: How to ensure transaction here?
-            await _messagePublisher.SendAsync(message, cancellationToken);
-            await this.ConfirmAsync(message, cancellationToken);
+            await _messagePublisher.SendAsync(messages, cancellationToken).ConfigureAwait(false);
+            await ConfirmAsync(messages, cancellationToken).ConfigureAwait(false);
         }
     }
 }

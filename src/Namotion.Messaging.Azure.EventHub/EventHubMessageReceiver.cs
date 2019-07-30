@@ -109,7 +109,7 @@ namespace Namotion.Messaging.Azure.EventHub
         }
 
         /// <inheritdoc/>
-        public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             // There is no message rejection in Event Hubs
             _logger.LogWarning("Message has been rejected which is not supported by Event Hub.");
@@ -118,13 +118,13 @@ namespace Namotion.Messaging.Azure.EventHub
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException" />
-        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
         /// <inheritdoc/>
-        public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             // Keep alive is not needed as there is no timeout in Event Hubs
             return Task.CompletedTask;

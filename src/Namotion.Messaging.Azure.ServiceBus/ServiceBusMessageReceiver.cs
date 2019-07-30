@@ -70,11 +70,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
                         }
                         catch
                         {
-                            // TODO: Improve, also what happens on cancel here?
-                            foreach (var abstractMessage in abstractMessages)
-                            {
-                                await RejectAsync(abstractMessage, cancellationToken).ConfigureAwait(false);
-                            }
+                            await RejectAsync(abstractMessages, cancellationToken).ConfigureAwait(false);
                         }
                     }
                 }
@@ -93,9 +89,12 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public Task KeepAliveAsync(Abstractions.Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(IEnumerable<Abstractions.Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.RenewLockAsync((string)message.SystemProperties[LockTokenProperty]);
+            return Task.WhenAll(messages.Select(m =>
+            {
+                return _messageReceiver.RenewLockAsync((string)m.SystemProperties[LockTokenProperty]);
+            }));
         }
 
         /// <inheritdoc/>
@@ -105,15 +104,21 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public Task RejectAsync(Abstractions.Message message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.AbandonAsync((string)message.SystemProperties[LockTokenProperty]);
+            return Task.WhenAll(messages.Select(m =>
+            {
+                return _messageReceiver.AbandonAsync((string)m.SystemProperties[LockTokenProperty]);
+            }));
         }
 
         /// <inheritdoc/>
-        public Task DeadLetterAsync(Abstractions.Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Abstractions.Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription);
+            return Task.WhenAll(messages.Select(m =>
+            {
+                return _messageReceiver.DeadLetterAsync((string)m.SystemProperties[LockTokenProperty], reason, errorDescription);
+            }));
         }
 
         private Abstractions.Message ConvertToMessage(Message message)

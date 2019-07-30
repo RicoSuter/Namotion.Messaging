@@ -34,13 +34,13 @@ namespace Namotion.Messaging.Abstractions
         Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Extends the message lock timeout on the given message.
+        /// Extends the message lock timeout on the given messages.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="messages">The messages.</param>
         /// <param name="timeToLive">The desired time to live.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default);
+        Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Confirms the processing of messages and removes them from the queue.
@@ -51,21 +51,21 @@ namespace Namotion.Messaging.Abstractions
         Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Rejects a message and requeues it for later reprocessing.
+        /// Rejects messages and requeues them for later reprocessing.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="messages">The messages.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        Task RejectAsync(Message message, CancellationToken cancellationToken = default);
+        Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Removes the message and moves it to the dead letter queue.
+        /// Removes the messages and moves them to the dead letter queue.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="messages">The messages.</param>
         /// <param name="reason">The reason.</param>
         /// <param name="errorDescription">The error description.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default);
+        Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default);
     }
 }

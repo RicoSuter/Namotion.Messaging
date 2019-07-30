@@ -96,30 +96,37 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <inheritdoc/>
         public async Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
-            await Task.WhenAll(messages
-                .Select(m => _queue.DeleteMessageAsync(m.Id, (string)m.SystemProperties[PopReceiptProperty])))
-            .ConfigureAwait(false);
+            await Task.WhenAll(messages.Select(m =>
+            {
+                return _queue.DeleteMessageAsync(m.Id, (string)m.SystemProperties[PopReceiptProperty]);
+            })).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         /// <exception cref="NotImplementedException" />
-        public async Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
-            var nativeMessage = (CloudQueueMessage)message.Properties[NativeMessageProperty];
-            await _queue.UpdateMessageAsync(nativeMessage, timeToLive ?? DefaultTimeToLive, MessageUpdateFields.Visibility).ConfigureAwait(false);
+            return Task.WhenAll(messages.Select(m =>
+            {
+                var nativeMessage = (CloudQueueMessage)m.Properties[NativeMessageProperty];
+                return _queue.UpdateMessageAsync(nativeMessage, timeToLive ?? DefaultTimeToLive, MessageUpdateFields.Visibility);
+            }));
         }
 
         /// <inheritdoc/>
         /// <exception cref="NotImplementedException" />
-        public async Task RejectAsync(Message message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
-            var nativeMessage = (CloudQueueMessage)message.Properties[NativeMessageProperty];
-            await _queue.UpdateMessageAsync(nativeMessage, RejectDelay, MessageUpdateFields.Visibility).ConfigureAwait(false);
+            return Task.WhenAll(messages.Select(m =>
+            {
+                var nativeMessage = (CloudQueueMessage)m.Properties[NativeMessageProperty];
+                return _queue.UpdateMessageAsync(nativeMessage, RejectDelay, MessageUpdateFields.Visibility);
+            }));
         }
 
         /// <inheritdoc/>
         /// <exception cref="NotImplementedException" />
-        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

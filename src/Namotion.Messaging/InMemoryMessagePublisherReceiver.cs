@@ -101,18 +101,18 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public async Task RejectAsync(Message message, CancellationToken cancellationToken = default)
+        public async Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             await Task.Delay(1000).ConfigureAwait(false);
-            await SendAsync(new Message[] { message }, cancellationToken).ConfigureAwait(false);
+            await SendAsync(messages, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             lock (_lock)
             {
-                _deadLetterMessages.Add(message);
+                _deadLetterMessages.AddRange(messages);
             }
 
             return Task.CompletedTask;
@@ -125,7 +125,7 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

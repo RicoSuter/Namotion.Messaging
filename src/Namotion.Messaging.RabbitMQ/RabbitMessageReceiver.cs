@@ -64,13 +64,14 @@ namespace Namotion.Messaging.RabbitMQ
                         }
                     );
 
+                    var messages = new Message[] { message };
                     try
                     {
-                        await handleMessages(new Message[] { message }, cancellationToken).ConfigureAwait(false);
+                        await handleMessages(messages, cancellationToken).ConfigureAwait(false);
                     }
                     catch
                     {
-                        await RejectAsync(message, cancellationToken).ConfigureAwait(false);
+                        await RejectAsync(messages, cancellationToken).ConfigureAwait(false);
                     }
                 };
 
@@ -100,24 +101,28 @@ namespace Namotion.Messaging.RabbitMQ
         }
 
         /// <inheritdoc/>
-        public Task RejectAsync(Message message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
 
-            _channel.BasicReject((ulong)message.Properties[DeliveryTagProperty], true);
+            foreach (var message in messages)
+            {
+                _channel.BasicReject((ulong)message.Properties[DeliveryTagProperty], true);
+            }
+
             return Task.CompletedTask;
         }
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException" />
-        public Task DeadLetterAsync(Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException" />
-        public Task KeepAliveAsync(Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
