@@ -19,6 +19,8 @@ namespace Namotion.Messaging.Abstractions
         /// <returns>The task.</returns>
         public static Task KeepAliveAsync(this IMessageReceiver messageReceiver, Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
+            _ = message ?? throw new ArgumentNullException(nameof(message));
+
             return messageReceiver.KeepAliveAsync(new Message[] { message }, timeToLive, cancellationToken);
         }
 
@@ -31,6 +33,8 @@ namespace Namotion.Messaging.Abstractions
         /// <returns>The task.</returns>
         public static Task ConfirmAsync(this IMessageReceiver messageReceiver, Message message, CancellationToken cancellationToken = default)
         {
+            _ = message ?? throw new ArgumentNullException(nameof(message));
+
             return messageReceiver.ConfirmAsync(new Message[] { message }, cancellationToken);
         }
 
@@ -43,6 +47,8 @@ namespace Namotion.Messaging.Abstractions
         /// <returns>The task.</returns>
         public static Task RejectAsync(this IMessageReceiver messageReceiver, Message message, CancellationToken cancellationToken = default)
         {
+            _ = message ?? throw new ArgumentNullException(nameof(message));
+
             return messageReceiver.RejectAsync(new Message[] { message }, cancellationToken);
         }
 
@@ -57,6 +63,8 @@ namespace Namotion.Messaging.Abstractions
         /// <returns>The task.</returns>
         public static Task DeadLetterAsync(this IMessageReceiver messageReceiver, Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
+            _ = message ?? throw new ArgumentNullException(nameof(message));
+
             return messageReceiver.DeadLetterAsync(new Message[] { message }, reason, errorDescription, cancellationToken);
         }
     }

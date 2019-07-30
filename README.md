@@ -2,18 +2,14 @@
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://rsuter.visualstudio.com/Namotion/_build?definitionId=19)
 
-The Namotion.Messaging .NET libraries provide abstractions and implementations for message/event queues and data ingestion services.
+The Namotion.Messaging .NET libraries provide abstractions and implementations for message brokers, event queues and data ingestion services.
 
-This enables the following scenarios: 
+By programming against a messaging abstraction you enable the following scenarios: 
 
-- Build **multi-cloud capable applications** by easily change messaging technologies on demand.
-- Quickly **try out different messaging technologies** to find the best fit for your applications.
-- Implement behavior driven integration **tests which can run in-memory** or against different technologies for debugging and faster execution. 
-- Provide **better local development experiences** (e.g. replace Service Bus with the dockerizable RabbitMQ technology locally).
-
-## Extensions
-
-Behavior extensions, for example custom dead letter queues or large message handling, is achieved with interceptors which wrap publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods. Custom interceptors can be implemented with the `MessagePublisher<T>` and `MessageReceiver<T>` classes.
+- Build **multi-cloud capable applications** by being able to change messaging technologies on demand. 
+- Quickly **switch to different messaging technologies** to find the best technological fit for your applications. 
+- Implement behavior driven **integration tests which can run in-memory** or against different technologies for better debugging experiences or local execution. 
+- Provide **better local development experiences**, for example replace the Service Bus usage with a locally running RabbitMQ docker container or an in-memory implementation. 
 
 ## Usage
 
@@ -32,6 +28,13 @@ public class MyBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await _messageReceiver.ListenAsync(stoppingToken);
+    }
+
+    private async Task ProcessMessagesAsync(IReadOnlyCollection<Message> messages, CancellationToken cancellationToken)
+    {
+        ...
+
+        await _messageReceiver.ConfirmAsync(messages, cancellationToken);
     }
 }
 ```
@@ -53,6 +56,10 @@ public static async Task Main(string[] args)
     await host.RunAsync();
 }
 ```
+
+## Extensions
+
+Behavior extensions, for example custom dead letter queues or large message handling, is achieved with interceptors which wrap publisher and receiver methods with custom code. These interceptors are added with the `With*` extension methods. Custom interceptors can be implemented with the `MessagePublisher<T>` and `MessageReceiver<T>` classes.
 
 ## Core packages
 

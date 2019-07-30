@@ -53,6 +53,8 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
+            _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
+
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
@@ -91,6 +93,8 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <inheritdoc/>
         public Task KeepAliveAsync(IEnumerable<Abstractions.Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             return Task.WhenAll(messages.Select(m =>
             {
                 return _messageReceiver.RenewLockAsync((string)m.SystemProperties[LockTokenProperty]);
@@ -100,12 +104,16 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <inheritdoc/>
         public Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             return _messageReceiver.CompleteAsync(messages.Select(m => (string)m.SystemProperties[LockTokenProperty]));
         }
 
         /// <inheritdoc/>
         public Task RejectAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             return Task.WhenAll(messages.Select(m =>
             {
                 return _messageReceiver.AbandonAsync((string)m.SystemProperties[LockTokenProperty]);
@@ -115,6 +123,8 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <inheritdoc/>
         public Task DeadLetterAsync(IEnumerable<Abstractions.Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             return Task.WhenAll(messages.Select(m =>
             {
                 return _messageReceiver.DeadLetterAsync((string)m.SystemProperties[LockTokenProperty], reason, errorDescription);

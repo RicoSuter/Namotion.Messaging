@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.EventHubs;
 using Namotion.Messaging.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,6 +47,8 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <inheritdoc/>
         public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             await Task.WhenAll(messages
                 .GroupBy(m => m.PartitionId)
                 .Select(g => Task.Run(async () =>

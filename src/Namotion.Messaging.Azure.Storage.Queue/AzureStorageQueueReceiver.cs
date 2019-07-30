@@ -72,6 +72,8 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
+            _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
@@ -96,6 +98,8 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <inheritdoc/>
         public async Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             await Task.WhenAll(messages.Select(m =>
             {
                 return _queue.DeleteMessageAsync(m.Id, (string)m.SystemProperties[PopReceiptProperty]);
@@ -106,6 +110,8 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <exception cref="NotImplementedException" />
         public Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             return Task.WhenAll(messages.Select(m =>
             {
                 var nativeMessage = (CloudQueueMessage)m.Properties[NativeMessageProperty];
@@ -117,6 +123,8 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <exception cref="NotImplementedException" />
         public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             return Task.WhenAll(messages.Select(m =>
             {
                 var nativeMessage = (CloudQueueMessage)m.Properties[NativeMessageProperty];

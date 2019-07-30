@@ -82,6 +82,8 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
+            _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
+
             try
             {
                 var factory = new EventProcessorFactory(handleMessages, _host, _logger, cancellationToken);

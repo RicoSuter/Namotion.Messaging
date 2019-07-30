@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Abstractions
@@ -17,6 +18,8 @@ namespace Namotion.Messaging.Abstractions
         /// <returns>The task.</returns>
         public static Task SendAsync(this IMessagePublisher messagePublisher, Message message, CancellationToken cancellationToken = default)
         {
+            _ = message ?? throw new ArgumentNullException(nameof(message));
+
             return messagePublisher.SendAsync(new Message[] { message }, cancellationToken);
         }
     }

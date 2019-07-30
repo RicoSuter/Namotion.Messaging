@@ -51,6 +51,8 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <inheritdoc />
         public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             foreach (var message in messages)
             {
                 var nativeMessage = ConvertToMessage(message);

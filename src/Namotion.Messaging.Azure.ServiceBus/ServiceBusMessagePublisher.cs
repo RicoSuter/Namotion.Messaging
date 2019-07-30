@@ -44,6 +44,8 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <inheritdoc/>
         public async Task SendAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             await _client.SendAsync(messages.Select(m => CreateMessage(m)).ToList());
         }
 

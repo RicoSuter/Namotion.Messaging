@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Namotion.Messaging.Abstractions;
@@ -35,6 +36,8 @@ namespace Namotion.Messaging.RabbitMQ
         /// <inheritdoc/>
         public Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+
             if (_connection == null)
             {
                 lock (_lock)

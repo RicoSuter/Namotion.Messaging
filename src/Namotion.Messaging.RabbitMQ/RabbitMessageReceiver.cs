@@ -37,6 +37,12 @@ namespace Namotion.Messaging.RabbitMQ
         /// <inheritdoc/>
         public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
+            _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
+            if (_channel != null)
+            {
+                throw new InvalidOperationException("The receiver is already listening for messages.");
+            }
+
             var factory = new ConnectionFactory
             {
                 HostName = _configuration.Host,
@@ -77,8 +83,9 @@ namespace Namotion.Messaging.RabbitMQ
 
                 _channel.BasicConsume(_configuration.QueueName, _configuration.AutoAck, consumer);
                 await Task.Delay(Timeout.Infinite, cancellationToken);
-                _channel = null;
             }
+
+            _channel = null;
         }
 
         /// <inheritdoc/>
@@ -90,6 +97,7 @@ namespace Namotion.Messaging.RabbitMQ
         /// <inheritdoc/>
         public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
 
             foreach (var message in messages)
@@ -103,6 +111,7 @@ namespace Namotion.Messaging.RabbitMQ
         /// <inheritdoc/>
         public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
             _ = _channel ?? throw new InvalidOperationException("Queue is not in listening mode.");
 
             foreach (var message in messages)
