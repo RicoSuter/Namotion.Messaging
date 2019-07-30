@@ -71,15 +71,15 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 
 - **IMessagePublisher\<T>**
 - **IMessagePublisher**
-    - `SendAsync()`: Sends a batch of messages to the queue.
+    - `SendAsync(messages, cancellationToken)`: Sends a batch of messages to the queue.
 - **IMessageReceiver\<T>**
 - **IMessageReceiver**
-    - `GetMessageCountAsync()`: Gets the count of messages waiting to be processed.
+    - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
     - `ListenAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
-    - `KeepAliveAsync()`: Extends the message lock timeout on the given message.
-    - `ConfirmAsync()`: Confirms the processing of messages and removes them from the queue.
-    - `RejectAsync()`: Rejects a message and requeues it for later reprocessing.
-    - `DeadLetterAsync()`: Removes the message and moves it to the dead letter queue.
+    - `KeepAliveAsync(messages, timeToLive, cancellationToken)`: Extends the message lock timeout on the given message.
+    - `ConfirmAsync(messages, cancellationToken)`: Confirms the processing of messages and removes them from the queue.
+    - `RejectAsync(messages, cancellationToken)`: Rejects a message and requeues it for later reprocessing.
+    - `DeadLetterAsync(messages, reason, errorDescription, cancellationToken)`: Removes the message and moves it to the dead letter queue.
 - **Message\<T>:**
 - **Message:** A generic message implementation.
 
