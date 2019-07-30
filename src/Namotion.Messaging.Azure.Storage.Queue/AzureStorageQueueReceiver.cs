@@ -81,7 +81,15 @@ namespace Namotion.Messaging.Azure.Storage.Queue
                     var batch = await _queue.GetMessagesAsync(_maxBatchSize, TimeSpan.FromSeconds(30), null, null, cancellationToken).ConfigureAwait(false);
                     if (batch != null && batch.Any())
                     {
-                        await handleMessages(batch.Select(m => ConvertToMessage(m)).ToArray(), cancellationToken).ConfigureAwait(false);
+                        var messages = batch.Select(m => ConvertToMessage(m)).ToArray();
+                        try
+                        {
+                            await handleMessages(messages, cancellationToken).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            await RejectAsync(messages, cancellationToken).ConfigureAwait(false);
+                        }
                     }
                     else
                     {

@@ -158,14 +158,14 @@ Extension methods to enhance or modify instances:
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.ServiceBus/)
 
-Implementations:
+Implementations: 
 
 - **ServiceBusMessagePublisher**
 - **ServiceBusMessageReceiver**
 
 Behavior: 
 
-- When `handleMessages` throws an exception, then the message is abandoned and later reprocessed until it is moved to the dead letter queue.
+- When `handleMessages` throws an exception, then the messages are abandoned and later reprocessed until they are moved to the dead letter queue.
 
 Dependencies: 
 
@@ -175,7 +175,7 @@ Dependencies:
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.EventHub.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.EventHub/)
 
-Implementations:
+Implementations: 
 
 - **EventHubMessagePublisher**
 - **EventHubMessageReceiver**
@@ -188,18 +188,35 @@ Dependencies:
 
 - [Microsoft.Azure.EventHubs.Processor](https://www.nuget.org/packages/Microsoft.Azure.EventHubs.Processor/)
 
+### Namotion.Messaging.Azure.Storage.Queue
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.Storage.Queue.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.Storage.Queue/)
+
+Implementations: 
+
+- **AzureStorageQueuePublisher**
+- **AzureStorageQueueReceiver**
+
+Behavior: 
+
+- When `handleMessages` throws an exception, then the messages are rejected and later reprocessed.
+
+Dependencies: 
+
+- [Microsoft.Azure.Storage.Queue](https://www.nuget.org/packages/Microsoft.Azure.Storage.Queue)
+
 ### Namotion.Messaging.RabbitMQ
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.RabbitMQ.svg)](https://www.nuget.org/packages/Namotion.Messaging.RabbitMQ/)
 
-Implementations:
+Implementations: 
 
 - **RabbitMessagePublisher**
 - **RabbitMessageReceiver**
 
 Behavior: 
 
-- When `handleMessages` throws an exception, then the message is rejected and later reprocessed.
+- When `handleMessages` throws an exception, then the messages are rejected and later reprocessed.
 
 Dependencies: 
 
