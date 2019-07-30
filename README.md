@@ -129,15 +129,17 @@ The following packages should only be used in the head project, i.e. directly in
 | SendAsync             | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
 | ListenAsync           | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
 | GetMessageCountAsync  | :x:                     | :x:                       | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
-| KeepAliveAsync        | :heavy_check_mark:      | Ignored (1.)              | :heavy_check_mark:        | :x:                 | Ignored             |
-| ConfirmAsync          | :heavy_check_mark:      | Ignored (1.)              | :heavy_check_mark:        | :heavy_check_mark:  | Ignored             |
-| RejectAsync           | :heavy_check_mark:      | Ignored (1.)              | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
+| KeepAliveAsync        | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :x:                 | :heavy_minus_sign:  |
+| ConfirmAsync          | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_minus_sign:  |
+| RejectAsync           | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
 | DeadLetterAsync       | :heavy_check_mark:      | :x: (2.)                  | :x: (2.)                  | :x: (2.)            | :heavy_check_mark:  |
 | User properties       | :heavy_check_mark:      | :heavy_check_mark:        | :x: (3.)                  | :heavy_check_mark:  | :heavy_check_mark:  |
 
 1) Because Event Hub is stream based and transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
 3) Use `receiver.WithPropertiesInContent()` to enable user properties support (not implemented yet).
+
+:heavy_minus_sign: = Noop/Ignored
 
 ### Namotion.Messaging
 
