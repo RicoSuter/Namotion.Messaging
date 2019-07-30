@@ -124,16 +124,16 @@ await publisher.ListenJsonAsync(async (messages, ct) =>
 
 The following packages should only be used in the head project, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
-|                       | ServiceBus     | EventHub            | RabbitMQ            | AzureStorageQueue   | InMemory   |
-|-----------------------|----------------|---------------------|---------------------|---------------------|------------|
-| SendAsync             | Supported      | Supported           | Supported           | Supported           | Supported  |
-| ListenAsync           | Supported      | Supported           | Supported           | Supported           | Supported  |
-| GetMessageCountAsync  | Not supported  | Not supported       | Supported           | Supported           | Supported  |
-| KeepAliveAsync        | Supported      | Ignored (1.)        | Not supported       | Supported           | Ignored    |
-| ConfirmAsync          | Supported      | Ignored (1.)        | Supported           | Supported           | Ignored    |
-| RejectAsync           | Supported      | Ignored (1.)        | Supported           | Supported           | Supported  |
-| DeadLetterAsync       | Supported      | Not supported (2.)  | Not supported (2.)  | Not supported (2.)  | Supported  |
-| User properties       | Supported      | Supported           | Supported           | Not supported (3.)  | Supported  |
+|                       | ServiceBus         | EventHub            | RabbitMQ            | AzureStorageQueue   | InMemory            |
+|-----------------------|--------------------|---------------------|---------------------|---------------------|---------------------|
+| SendAsync             | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  |
+| ListenAsync           | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  |
+| GetMessageCountAsync  | :x:                | :x:                 | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  |
+| KeepAliveAsync        | :heavy_check_mark: | Ignored (1.)        | :x:                 | :heavy_check_mark:  | Ignored             |
+| ConfirmAsync          | :heavy_check_mark: | Ignored (1.)        | :heavy_check_mark:  | :heavy_check_mark:  | Ignored             |
+| RejectAsync           | :heavy_check_mark: | Ignored (1.)        | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  |
+| DeadLetterAsync       | :heavy_check_mark: | :x: (2.)            | :x: (2.)            | :x: (2.)            | :heavy_check_mark:  |
+| User properties       | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  | :x: (3.)            | :heavy_check_mark:  |
 
 1) Because Event Hub is stream based and transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
