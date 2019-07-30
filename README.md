@@ -124,7 +124,7 @@ await publisher.ListenJsonAsync(async (messages, ct) =>
 
 The following packages should only be used in the head project, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
-|                       | Azure Service Bus  | Azure Event Hub     | Azure Storage Queue | RabbitMQ            | InMemory            |
+|                       | Azure<br /> Service Bus  | Azure<br /> Event Hub     | Azure<br /> Storage Queue | RabbitMQ            | InMemory            |
 |-----------------------|--------------------|---------------------|---------------------|---------------------|---------------------|
 | SendAsync             | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  |
 | ListenAsync           | :heavy_check_mark: | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  |
