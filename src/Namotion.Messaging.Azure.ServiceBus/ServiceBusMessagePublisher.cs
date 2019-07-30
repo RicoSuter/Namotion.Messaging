@@ -53,19 +53,19 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _client.CloseAsync().GetAwaiter().GetResult();
         }
 
-        private Microsoft.Azure.ServiceBus.Message CreateMessage(Abstractions.Message message)
+        private Microsoft.Azure.ServiceBus.Message CreateMessage(Abstractions.Message abstractMessage)
         {
-            var abstractMessage = new Microsoft.Azure.ServiceBus.Message(message.Content)
+            var message = new Microsoft.Azure.ServiceBus.Message(abstractMessage.Content)
             {
-                MessageId = message.Id ?? Guid.NewGuid().ToString()
+                MessageId = abstractMessage.Id ?? Guid.NewGuid().ToString()
             };
 
-            foreach (var property in message.Properties)
+            foreach (var property in abstractMessage.Properties)
             {
-                abstractMessage.UserProperties[property.Key] = property.Value;
+                message.UserProperties[property.Key] = property.Value;
             }
 
-            return abstractMessage;
+            return message;
         }
     }
 }

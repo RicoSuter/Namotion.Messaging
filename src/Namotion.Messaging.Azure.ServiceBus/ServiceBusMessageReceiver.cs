@@ -17,20 +17,23 @@ namespace Namotion.Messaging.Azure.ServiceBus
         private const string DeliveryCountProperty = "DeliveryCount";
 
         private MessageReceiver _messageReceiver;
+        private readonly int _maxBatchSize;
 
-        private ServiceBusMessageReceiver(MessageReceiver messageReceiver)
+        private ServiceBusMessageReceiver(MessageReceiver messageReceiver, int maxBatchSize)
         {
             _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
+            _maxBatchSize = maxBatchSize;
         }
 
         /// <summary>
         /// Creates a new Service Bus receiver from a message receiver.
         /// </summary>
         /// <param name="messageReceiver">The message receiver.</param>
+        /// <param name="maxMessageCount">The maximum message count (default: 1).</param>
         /// <returns>The message publisher.</returns>
-        public static Abstractions.IMessageReceiver CreateFromMessageReceiver(MessageReceiver messageReceiver)
+        public static Abstractions.IMessageReceiver CreateFromMessageReceiver(MessageReceiver messageReceiver, int maxMessageCount = 1)
         {
-            return new ServiceBusMessageReceiver(messageReceiver);
+            return new ServiceBusMessageReceiver(messageReceiver, maxMessageCount);
         }
 
         /// <summary>
@@ -39,11 +42,12 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <param name="connectionString">The connection string.</param>
         /// <param name="entityPath">The entity path.</param>
         /// <param name="receiveMode">The receive mode (default: PeekLock).</param>
+        /// <param name="maxBatchSize">The maximum batch size (default: 1).</param>
         /// <returns>The message publisher.</returns>
         public static Abstractions.IMessageReceiver Create(
-            string connectionString, string entityPath, ReceiveMode receiveMode = ReceiveMode.PeekLock)
+            string connectionString, string entityPath, ReceiveMode receiveMode = ReceiveMode.PeekLock, int maxBatchSize = 1)
         {
-            return new ServiceBusMessageReceiver(new MessageReceiver(connectionString, entityPath, receiveMode));
+            return new ServiceBusMessageReceiver(new MessageReceiver(connectionString, entityPath, receiveMode), maxBatchSize);
         }
 
         /// <inheritdoc/>
@@ -53,17 +57,25 @@ namespace Namotion.Messaging.Azure.ServiceBus
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var message = ConvertToMessage(await _messageReceiver
-                        .ReceiveAsync(TimeSpan.FromSeconds(1))
-                        .ConfigureAwait(false));
+                    var messages = await _messageReceiver
+                        .ReceiveAsync(_maxBatchSize, TimeSpan.FromSeconds(30))
+                        .ConfigureAwait(false);
 
-                    try
+                    if (messages != null && messages.Any())
                     {
-                        await handleMessages(new Abstractions.Message[] { message }, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch
-                    {
-                        await RejectAsync(message, cancellationToken).ConfigureAwait(false);
+                        var abstractMessages = messages.Select(ConvertToMessage).ToArray();
+                        try
+                        {
+                            await handleMessages(abstractMessages, cancellationToken).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            // TODO: Improve, also what happens on cancel here?
+                            foreach (var abstractMessage in abstractMessages)
+                            {
+                                await RejectAsync(abstractMessage, cancellationToken).ConfigureAwait(false);
+                            }
+                        }
                     }
                 }
             }
@@ -81,30 +93,27 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public async Task KeepAliveAsync(Abstractions.Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(Abstractions.Message message, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
-            await _messageReceiver.RenewLockAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
+            return _messageReceiver.RenewLockAsync((string)message.SystemProperties[LockTokenProperty]);
         }
 
         /// <inheritdoc/>
-        public async Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
-            await Task.WhenAll(messages.Select(m =>
-            {
-                return _messageReceiver.CompleteAsync((string)m.SystemProperties[LockTokenProperty]);
-            })).ConfigureAwait(false);
+            return _messageReceiver.CompleteAsync(messages.Select(m => (string)m.SystemProperties[LockTokenProperty]));
         }
 
         /// <inheritdoc/>
-        public async Task RejectAsync(Abstractions.Message message, CancellationToken cancellationToken = default)
+        public Task RejectAsync(Abstractions.Message message, CancellationToken cancellationToken = default)
         {
-            await _messageReceiver.AbandonAsync((string)message.SystemProperties[LockTokenProperty]).ConfigureAwait(false);
+            return _messageReceiver.AbandonAsync((string)message.SystemProperties[LockTokenProperty]);
         }
 
         /// <inheritdoc/>
-        public async Task DeadLetterAsync(Abstractions.Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(Abstractions.Message message, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            await _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription).ConfigureAwait(false);
+            return _messageReceiver.DeadLetterAsync((string)message.SystemProperties[LockTokenProperty], reason, errorDescription);
         }
 
         private Abstractions.Message ConvertToMessage(Message message)
