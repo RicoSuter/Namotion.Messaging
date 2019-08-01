@@ -27,7 +27,7 @@ public class MyBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageReceiver.ListenAsync(stoppingToken);
+        await _messageReceiver.ListenAsync(ProcessMessagesAsync, stoppingToken);
     }
 
     private async Task ProcessMessagesAsync(IReadOnlyCollection<Message> messages, CancellationToken cancellationToken)
