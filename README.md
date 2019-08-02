@@ -85,6 +85,8 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **Message\<T>:**
 - **Message:** A generic message implementation.
 
+The idea behind the generic interfaces is to allow multiple instance registrations, read [Dependency Injection in .NET: A way to work around missing named registrations](https://blog.rsuter.com/dotnet-dependency-injection-way-to-work-around-missing-named-registrations/) for more information.
+
 ### Namotion.Messaging.Json
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
