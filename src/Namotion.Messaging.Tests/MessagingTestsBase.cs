@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Xunit;
 using Namotion.Messaging.Abstractions;
-using Namotion.Messaging.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;

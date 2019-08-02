@@ -1,6 +1,8 @@
 # Namotion.Messaging
 
-[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://rsuter.visualstudio.com/Namotion/_build?definitionId=19)
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
+
+<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 
 The Namotion.Messaging .NET libraries provide abstractions and implementations for message brokers, event queues and data ingestion services.
 
@@ -27,7 +29,7 @@ public class MyBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageReceiver.ListenAsync(stoppingToken);
+        await _messageReceiver.ListenAsync(ProcessMessagesAsync, stoppingToken);
     }
 
     private async Task ProcessMessagesAsync(IReadOnlyCollection<Message> messages, CancellationToken cancellationToken)
