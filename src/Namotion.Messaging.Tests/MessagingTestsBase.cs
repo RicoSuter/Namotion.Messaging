@@ -17,10 +17,7 @@ namespace Namotion.Messaging.Tests
         public async Task WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
         {
             // Arrange
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
+            var config = GetConfiguration();
 
             int count = GetMessageCount();
             var content = Guid.NewGuid().ToByteArray();
@@ -66,10 +63,7 @@ namespace Namotion.Messaging.Tests
         public async Task WhenSendingJsonMessages_ThenMessagesShouldBeReceived()
         {
             // Arrange
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
+            var config = GetConfiguration();
 
             int count = GetMessageCount();
             var orderId = Guid.NewGuid().ToString();
@@ -138,6 +132,14 @@ namespace Namotion.Messaging.Tests
         protected abstract IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration);
 
         protected abstract IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration);
+
+        private static IConfigurationRoot GetConfiguration()
+        {
+            return new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+        }
     }
 
     public class MyMessage
