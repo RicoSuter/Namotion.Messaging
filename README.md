@@ -169,6 +169,7 @@ Implementations:
 
 Behavior: 
 
+- Multiple queue receivers will process messages in parallel (competing consumers).
 - When `handleMessages` throws an exception, then the messages are abandoned and later reprocessed until they are moved to the dead letter queue.
 
 Dependencies: 
@@ -186,6 +187,7 @@ Implementations:
 
 Behavior: 
 
+- Messages are processed in sequence per partition and can only be retried immediately or be ignored.
 - Exceptions from `handleMessages` are logged and then ignored, i.e. the processing moves forward in the partition.
 
 Dependencies: 
