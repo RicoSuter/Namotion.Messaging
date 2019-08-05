@@ -109,18 +109,18 @@ await publisher.SendAsJsonAsync(new OrderCreatedMessage { ... });
 Receive JSON encoded messages:
 
 ```CSharp
-var publisher = ServiceBusMessageReceiver
+var receiver = ServiceBusMessageReceiver
     .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
-await publisher.ListenAndDeserializeJsonAsync(async (messages, ct) => 
+await receiver.ListenAndDeserializeJsonAsync(async (messages, ct) => 
 {
     foreach (OrderCreatedMessage message in messages.Select(m => m.Object))
     {
         ...
     }
 
-    await publisher.ConfirmAsync(messages, ct);
+    await receiver.ConfirmAsync(messages, ct);
 });
 ```
 
