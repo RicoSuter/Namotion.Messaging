@@ -3,6 +3,7 @@ using Namotion.Messaging.Abstractions;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Namotion.Messaging.Azure.ServiceBus;
+using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Tests.Implementations
 {
@@ -22,13 +23,18 @@ namespace Namotion.Messaging.Tests.Implementations
                 .WithMessageType<MyMessage>();
         }
 
-        protected override void Validate(List<Message> messages)
+        public override async Task<List<Message>> WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
         {
+            var messages = await base.WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived();
+
+            // Assert
             foreach (var message in messages)
             {
                 Assert.Equal(1, message.SystemProperties["DeliveryCount"]);
                 Assert.NotNull(message.Id);
             }
+
+            return messages;
         }
     }
 }

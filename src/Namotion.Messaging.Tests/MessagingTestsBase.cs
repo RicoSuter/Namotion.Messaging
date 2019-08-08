@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Xunit;
 using Namotion.Messaging.Abstractions;
-using Namotion.Messaging.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
@@ -14,13 +13,10 @@ namespace Namotion.Messaging.Tests
     public abstract class MessagingTestsBase
     {
         [Fact]
-        public async Task WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
+        public virtual async Task<List<Message>> WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
         {
             // Arrange
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
+            var config = GetConfiguration();
 
             int count = GetMessageCount();
             var content = Guid.NewGuid().ToByteArray();
@@ -59,17 +55,19 @@ namespace Namotion.Messaging.Tests
 
             // Assert
             Assert.Equal(count, messages.Count);
-            Validate(messages);
+            foreach (var message in messages)
+            {
+                Assert.Equal("hello", message.Properties["x-my-property"]);
+            }
+
+            return messages;
         }
 
         [Fact]
-        public async Task WhenSendingJsonMessages_ThenMessagesShouldBeReceived()
+        public virtual async Task<List<Message<MyMessage>>> WhenSendingJsonMessages_ThenMessagesShouldBeReceived()
         {
             // Arrange
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
+            var config = GetConfiguration();
 
             int count = GetMessageCount();
             var orderId = Guid.NewGuid().ToString();
@@ -108,6 +106,7 @@ namespace Namotion.Messaging.Tests
 
             // Assert
             Assert.Equal(count, messages.Count);
+            return messages;
         }
 
         protected virtual int GetMessageCount()
@@ -126,18 +125,17 @@ namespace Namotion.Messaging.Tests
                 });
         }
 
-        protected virtual void Validate(List<Message> messages)
-        {
-            // Assert
-            foreach (var message in messages)
-            {
-                Assert.Equal("hello", message.Properties["x-my-property"]);
-            }
-        }
-
         protected abstract IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration);
 
         protected abstract IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration);
+
+        private static IConfigurationRoot GetConfiguration()
+        {
+            return new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+        }
     }
 
     public class MyMessage

@@ -1,5 +1,8 @@
-﻿using Namotion.Messaging.Abstractions;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Namotion.Messaging.Abstractions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,35 +15,66 @@ namespace Namotion.Messaging
     /// </summary>
     public class InMemoryMessagePublisherReceiver : IMessagePublisher, IMessageReceiver
     {
-        private long _count = 0;
         private object _lock = new object();
-        private readonly bool _awaitProcessing;
-        private readonly List<Message> _deadLetterMessages = new List<Message>();
 
+        private readonly ConcurrentQueue<Message> _queue;
+        private readonly CancellationTokenSource _cancellationSource;
+
+        private readonly List<Message> _deadLetterMessages = new List<Message>();
+        private readonly ILogger _logger;
         private Dictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken> funcs =
             new Dictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken>();
 
-        private InMemoryMessagePublisherReceiver(bool awaitProcessing)
+        private InMemoryMessagePublisherReceiver(ILogger logger)
         {
-            _awaitProcessing = awaitProcessing;
+            _cancellationSource = new CancellationTokenSource();
+            _queue = new ConcurrentQueue<Message>();
+            _logger = logger;
+
+            Task.Run(async () =>
+            {
+                while (!_cancellationSource.Token.IsCancellationRequested)
+                {
+                    if (funcs.Any() && _queue.TryDequeue(out var message))
+                    {
+                        IEnumerable<Task> tasks;
+                        lock (_lock)
+                        {
+                            tasks = funcs.Select(f => Task.Run(() =>
+                            {
+                                try
+                                {
+                                    return f.Key(new[] { message }, f.Value);
+                                }
+                                catch (Exception e)
+                                {
+                                    if (!(e is TaskCanceledException))
+                                    {
+                                        _logger.LogError(e, "An error occurred in the in-memory message receiver.");
+                                    }
+
+                                    return Task.CompletedTask;
+                                }
+                            }));
+                        }
+
+                        await Task.WhenAll(tasks).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await Task.Delay(250).ConfigureAwait(false);
+                    }
+                }
+            }, _cancellationSource.Token);
         }
 
         /// <summary>
         /// Creates a new in-memory message publisher and receiver which sends messages without blocking.
         /// </summary>
         /// <returns>The publisher and receiver.</returns>
-        public static InMemoryMessagePublisherReceiver Create()
+        public static InMemoryMessagePublisherReceiver Create(ILogger logger = null)
         {
-            return new InMemoryMessagePublisherReceiver(false);
-        }
-
-        /// <summary>
-        /// Creates a new in-memory message publisher and receiver which sends messages with blocking.
-        /// </summary>
-        /// <returns>The publisher and receiver.</returns>
-        public static InMemoryMessagePublisherReceiver CreateWithMessageBlocking()
-        {
-            return new InMemoryMessagePublisherReceiver(true);
+            return new InMemoryMessagePublisherReceiver(logger ?? NullLogger.Instance);
         }
 
         /// <summary>
@@ -49,28 +83,17 @@ namespace Namotion.Messaging
         public IEnumerable<Message> DeadLetterMessages => _deadLetterMessages;
 
         /// <inheritdoc/>
-        public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
-            IEnumerable<Task> tasks;
             lock (_lock)
             {
-                _count += messages.Count();
-                tasks = funcs.Select(f => Task.Run(() => f.Key(messages.ToArray(), f.Value)));
-            }
-
-            var task = Task.WhenAll(tasks)
-                .ContinueWith(t =>
+                foreach (var message in messages)
                 {
-                    lock (_lock)
-                    {
-                        _count -= messages.Count();
-                    }
-                });
-
-            if (_awaitProcessing)
-            {
-                await task.ConfigureAwait(false);
+                    _queue.Enqueue(message);
+                }
             }
+
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc/>
@@ -121,7 +144,7 @@ namespace Namotion.Messaging
         /// <inheritdoc/>
         public Task<long> GetMessageCountAsync(CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(_count);
+            return Task.FromResult<long>(_queue.Count);
         }
 
         /// <inheritdoc/>
@@ -133,6 +156,7 @@ namespace Namotion.Messaging
         /// <inheritdoc/>
         public void Dispose()
         {
+            _cancellationSource.Cancel();
         }
     }
 }

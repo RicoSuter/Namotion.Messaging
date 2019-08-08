@@ -1,6 +1,8 @@
 # Namotion.Messaging
 
-[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://rsuter.visualstudio.com/Namotion/_build?definitionId=19)
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
+
+<img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 
 The Namotion.Messaging .NET libraries provide abstractions and implementations for message brokers, event queues and data ingestion services.
 
@@ -27,7 +29,7 @@ public class MyBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageReceiver.ListenAsync(stoppingToken);
+        await _messageReceiver.ListenAsync(ProcessMessagesAsync, stoppingToken);
     }
 
     private async Task ProcessMessagesAsync(IReadOnlyCollection<Message> messages, CancellationToken cancellationToken)
@@ -83,6 +85,8 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **Message\<T>:**
 - **Message:** A generic message implementation.
 
+The idea behind the generic interfaces is to allow multiple instance registrations, read [Dependency Injection in .NET: A way to work around missing named registrations](https://blog.rsuter.com/dotnet-dependency-injection-way-to-work-around-missing-named-registrations/) for more information.
+
 ### Namotion.Messaging.Json
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
@@ -105,18 +109,18 @@ await publisher.SendAsJsonAsync(new OrderCreatedMessage { ... });
 Receive JSON encoded messages:
 
 ```CSharp
-var publisher = ServiceBusMessageReceiver
+var receiver = ServiceBusMessageReceiver
     .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
-await publisher.ListenAndDeserializeJsonAsync(async (messages, ct) => 
+await receiver.ListenAndDeserializeJsonAsync(async (messages, ct) => 
 {
     foreach (OrderCreatedMessage message in messages.Select(m => m.Object))
     {
         ...
     }
 
-    await publisher.ConfirmAsync(messages, ct);
+    await receiver.ConfirmAsync(messages, ct);
 });
 ```
 
@@ -165,6 +169,7 @@ Implementations:
 
 Behavior: 
 
+- Multiple queue receivers will process messages in parallel (competing consumers).
 - When `handleMessages` throws an exception, then the messages are abandoned and later reprocessed until they are moved to the dead letter queue.
 
 Dependencies: 
@@ -182,6 +187,7 @@ Implementations:
 
 Behavior: 
 
+- Messages are processed in sequence per partition and can only be retried immediately or be ignored.
 - Exceptions from `handleMessages` are logged and then ignored, i.e. the processing moves forward in the partition.
 
 Dependencies: 
