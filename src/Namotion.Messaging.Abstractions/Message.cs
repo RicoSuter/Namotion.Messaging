@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Namotion.Messaging.Abstractions
 {
     /// <summary>
     /// A generic message with deserialized content to be used in all queue implementations.
     /// </summary>
-    public class Message<T> : Message
+    public class Message<T> : Message, IEquatable<Message<T>>
     {
         /// <summary>
         /// Creates an instance of <see cref="Message{T}"/>.
@@ -32,12 +33,47 @@ namespace Namotion.Messaging.Abstractions
         /// Gets the JSON deserialzed content.
         /// </summary>
         public T Object { get; }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Message<T>);
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(Message<T> other)
+        {
+            return other != null &&
+                   base.Equals(other) &&
+                   EqualityComparer<T>.Default.Equals(Object, other.Object);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            var hashCode = 180369264;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(Object);
+            return hashCode;
+        }
+
+        /// <inheritdoc/>
+        public static bool operator ==(Message<T> left, Message<T> right)
+        {
+            return EqualityComparer<Message<T>>.Default.Equals(left, right);
+        }
+
+        /// <inheritdoc/>
+        public static bool operator !=(Message<T> left, Message<T> right)
+        {
+            return !(left == right);
+        }
     }
 
     /// <summary>
     /// A generic message to be used in all queue implementations.
     /// </summary>
-    public class Message
+    public class Message : IEquatable<Message>
     {
         /// <summary>
         /// Creates an instance of <see cref="Message"/>.
@@ -102,6 +138,47 @@ namespace Namotion.Messaging.Abstractions
         public Message Clone()
         {
             return new Message(Id, Content, Properties, SystemProperties, PartitionId);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Message);
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(Message other)
+        {
+            return other != null &&
+                   Id == other.Id &&
+                   EqualityComparer<byte[]>.Default.Equals(Content, other.Content) &&
+                   PartitionId == other.PartitionId &&
+                   EqualityComparer<IReadOnlyDictionary<string, object>>.Default.Equals(Properties, other.Properties) &&
+                   EqualityComparer<IReadOnlyDictionary<string, object>>.Default.Equals(SystemProperties, other.SystemProperties);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            var hashCode = -268984773;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Id);
+            hashCode = hashCode * -1521134295 + EqualityComparer<byte[]>.Default.GetHashCode(Content);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PartitionId);
+            hashCode = hashCode * -1521134295 + EqualityComparer<IReadOnlyDictionary<string, object>>.Default.GetHashCode(Properties);
+            hashCode = hashCode * -1521134295 + EqualityComparer<IReadOnlyDictionary<string, object>>.Default.GetHashCode(SystemProperties);
+            return hashCode;
+        }
+
+        /// <inheritdoc/>
+        public static bool operator ==(Message left, Message right)
+        {
+            return EqualityComparer<Message>.Default.Equals(left, right);
+        }
+
+        /// <inheritdoc/>
+        public static bool operator !=(Message left, Message right)
+        {
+            return !(left == right);
         }
     }
 }

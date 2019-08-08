@@ -13,7 +13,7 @@ namespace Namotion.Messaging.Tests
     public abstract class MessagingTestsBase
     {
         [Fact]
-        public async Task WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
+        public virtual async Task<List<Message>> WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
         {
             // Arrange
             var config = GetConfiguration();
@@ -55,11 +55,16 @@ namespace Namotion.Messaging.Tests
 
             // Assert
             Assert.Equal(count, messages.Count);
-            Validate(messages);
+            foreach (var message in messages)
+            {
+                Assert.Equal("hello", message.Properties["x-my-property"]);
+            }
+
+            return messages;
         }
 
         [Fact]
-        public async Task WhenSendingJsonMessages_ThenMessagesShouldBeReceived()
+        public virtual async Task<List<Message<MyMessage>>> WhenSendingJsonMessages_ThenMessagesShouldBeReceived()
         {
             // Arrange
             var config = GetConfiguration();
@@ -101,6 +106,7 @@ namespace Namotion.Messaging.Tests
 
             // Assert
             Assert.Equal(count, messages.Count);
+            return messages;
         }
 
         protected virtual int GetMessageCount()
@@ -117,15 +123,6 @@ namespace Namotion.Messaging.Tests
                 {
                     { "x-my-property", "hello" }
                 });
-        }
-
-        protected virtual void Validate(List<Message> messages)
-        {
-            // Assert
-            foreach (var message in messages)
-            {
-                Assert.Equal("hello", message.Properties["x-my-property"]);
-            }
         }
 
         protected abstract IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration);
