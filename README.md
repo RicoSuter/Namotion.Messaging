@@ -73,7 +73,7 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 
 - **IMessagePublisher\<T>**
 - **IMessagePublisher**
-    - `SendAsync(messages, cancellationToken)`: Sends a batch of messages to the queue.
+    - `PublishAsync(messages, cancellationToken)`: Sends a batch of messages to the queue.
 - **IMessageReceiver\<T>**
 - **IMessageReceiver**
     - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
@@ -130,7 +130,7 @@ The following packages should only be used in the head project, i.e. directly in
 
 |                       | Azure<br /> Service Bus | Azure<br /> Event Hub     | Azure<br /> Storage Queue | RabbitMQ            | InMemory            |
 |-----------------------|-------------------------|---------------------------|---------------------------|---------------------|---------------------|
-| SendAsync             | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
+| PublishAsync          | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
 | ListenAsync           | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
 | GetMessageCountAsync  | :x:                     | :x:                       | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
 | KeepAliveAsync        | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :x:                 | :heavy_minus_sign:  |

@@ -16,11 +16,11 @@ namespace Namotion.Messaging.Abstractions
         /// <param name="message">The message.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task SendAsync(this IMessagePublisher messagePublisher, Message message, CancellationToken cancellationToken = default)
+        public static Task PublishAsync(this IMessagePublisher messagePublisher, Message message, CancellationToken cancellationToken = default)
         {
             _ = message ?? throw new ArgumentNullException(nameof(message));
 
-            return messagePublisher.SendAsync(new Message[] { message }, cancellationToken);
+            return messagePublisher.PublishAsync(new Message[] { message }, cancellationToken);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Namotion.Messaging.RabbitMQ
         }
 
         /// <inheritdoc/>
-        public Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 

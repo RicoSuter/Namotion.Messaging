@@ -42,7 +42,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public async Task SendAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 

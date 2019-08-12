@@ -46,7 +46,7 @@ namespace Namotion.Messaging.Tests
             }, listenCancellation.Token);
 
             var stopwatch = Stopwatch.StartNew();
-            await publisher.SendAsync(Enumerable.Range(1, count)
+            await publisher.PublishAsync(Enumerable.Range(1, count)
                 .Select(i => CreateMessage(content))
                 .ToList());
 

@@ -49,7 +49,7 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         }
 
         /// <inheritdoc />
-        public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 

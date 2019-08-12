@@ -28,7 +28,7 @@ namespace Namotion.Messaging
         /// <returns>The task.</returns>
         public static Task SendAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, T message, CancellationToken cancellationToken = default)
         {
-            return messagePublisher.SendAsync(ConvertToMessage(message), cancellationToken);
+            return messagePublisher.PublishAsync(ConvertToMessage(message), cancellationToken);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Namotion.Messaging
         /// <returns>The task.</returns>
         public static Task SendAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, IEnumerable<T> messages, CancellationToken cancellationToken = default)
         {
-            return messagePublisher.SendAsync(messages.Select(ConvertToMessage), cancellationToken);
+            return messagePublisher.PublishAsync(messages.Select(ConvertToMessage), cancellationToken);
         }
 
         private static Message ConvertToMessage<T>(T message)
