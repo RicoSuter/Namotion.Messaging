@@ -59,6 +59,8 @@ steps:
     feedsToUse: 'select'
     versioningScheme: 'off'
   env:
+    AwsAccessKeyId: $(AwsAccessKeyId)
+    AwsAccessKey: $(AwsAccessKeyId)
     EventHubConnectionString: $(EventHubConnectionString)
     EventHubStorageConnectionString: $(EventHubStorageConnectionString)
     ServiceBusConnectionString: $(ServiceBusConnectionString)
