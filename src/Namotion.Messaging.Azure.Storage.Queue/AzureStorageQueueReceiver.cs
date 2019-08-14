@@ -34,7 +34,7 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         }
 
         /// <summary>
-        /// Creates a new Storage Queue message publisher.
+        /// Creates a new Azure Storage Queue message publisher.
         /// </summary>
         /// <param name="accountName">The account name.</param>
         /// <param name="storageKey">The storage key.</param>
@@ -144,7 +144,7 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         /// <exception cref="NotImplementedException" />
         public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         private Message ConvertToMessage(CloudQueueMessage message)

@@ -26,7 +26,6 @@ namespace Namotion.Messaging.Tests
 
             // Act
             var messages = new List<Message>();
-
             var listenCancellation = new CancellationTokenSource();
             var receiveCancellation = new CancellationTokenSource();
             var task = receiver.ListenAsync(async (msgs, ct) =>
@@ -97,7 +96,7 @@ namespace Namotion.Messaging.Tests
             }, listenCancellation.Token);
 
             var stopwatch = Stopwatch.StartNew();
-            await publisher.SendAsJsonAsync(Enumerable.Range(1, count)
+            await publisher.PublishAsJsonAsync(Enumerable.Range(1, count)
                 .Select(i => new MyMessage { Id = orderId })
                 .ToList());
 
@@ -107,6 +106,20 @@ namespace Namotion.Messaging.Tests
             // Assert
             Assert.Equal(count, messages.Count);
             return messages;
+        }
+
+        [Fact]
+        public virtual async Task WhenRetrievingMessageCount_ThenCountIsGreaterOrEqualZero()
+        {
+            // Arrange
+            var config = GetConfiguration();
+            var receiver = CreateMessageReceiver(config);
+
+            // Act
+            var count = await receiver.GetMessageCountAsync();
+
+            // Assert
+            Assert.True(count >= 0);
         }
 
         protected virtual int GetMessageCount()

@@ -26,7 +26,7 @@ namespace Namotion.Messaging
         /// <param name="message">The message.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task SendAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, T message, CancellationToken cancellationToken = default)
+        public static Task PublishAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, T message, CancellationToken cancellationToken = default)
         {
             return messagePublisher.PublishAsync(ConvertToMessage(message), cancellationToken);
         }
@@ -38,7 +38,7 @@ namespace Namotion.Messaging
         /// <param name="messages">The messages.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task SendAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, IEnumerable<T> messages, CancellationToken cancellationToken = default)
+        public static Task PublishAsJsonAsync<T>(this IMessagePublisher<T> messagePublisher, IEnumerable<T> messages, CancellationToken cancellationToken = default)
         {
             return messagePublisher.PublishAsync(messages.Select(ConvertToMessage), cancellationToken);
         }
