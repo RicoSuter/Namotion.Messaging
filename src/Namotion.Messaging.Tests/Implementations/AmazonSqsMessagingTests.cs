@@ -11,7 +11,7 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return AmazonSqsMessageReceiver
-                .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
+                .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
                 .WithMessageType<MyMessage>();
         }
 
