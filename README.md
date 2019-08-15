@@ -240,6 +240,7 @@ Implementations:
 Behavior: 
 
 - When `handleMessages` throws an exception, then the messages are rejected and later reprocessed.
+- The message's `Content` bytes are serialized to Base64 because SQS can only handle string content.
 
 Dependencies: 
 

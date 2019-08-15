@@ -34,6 +34,8 @@ namespace Namotion.Messaging.Abstractions
         /// </summary>
         public T Object { get; }
 
+        #region Record
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
@@ -68,6 +70,8 @@ namespace Namotion.Messaging.Abstractions
         {
             return !(left == right);
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -140,6 +144,8 @@ namespace Namotion.Messaging.Abstractions
             return new Message(Id, Content, Properties, SystemProperties, PartitionId);
         }
 
+        #region Record
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
@@ -180,5 +186,7 @@ namespace Namotion.Messaging.Abstractions
         {
             return !(left == right);
         }
+
+        #endregion
     }
 }
