@@ -30,6 +30,8 @@ namespace Namotion.Messaging.Tests
             var receiveCancellation = new CancellationTokenSource();
             var task = receiver.ListenAsync(async (msgs, ct) =>
             {
+                await receiver.KeepAliveAsync(msgs, TimeSpan.FromMinutes(1));
+
                 foreach (var message in msgs
                     .Where(message => message.Content.SequenceEqual(content)))
                 {
