@@ -1,7 +1,9 @@
-﻿using Microsoft.Azure.EventHubs.Processor;
+﻿using System.Threading.Tasks;
+using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Extensions.Configuration;
 using Namotion.Messaging.Abstractions;
 using Namotion.Messaging.Azure.EventHub;
+using Xunit;
 
 namespace Namotion.Messaging.Tests.Implementations
 {
@@ -30,6 +32,12 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override int GetMessageCount()
         {
             return 1000;
+        }
+
+        [Fact(Skip = "Not supported")]
+        public override Task WhenRetrievingMessageCount_ThenCountIsGreaterOrEqualZero()
+        {
+            return base.WhenRetrievingMessageCount_ThenCountIsGreaterOrEqualZero();
         }
     }
 }

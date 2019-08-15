@@ -83,7 +83,7 @@ namespace Namotion.Messaging
         public IEnumerable<Message> DeadLetterMessages => _deadLetterMessages;
 
         /// <inheritdoc/>
-        public Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             lock (_lock)
             {
@@ -127,7 +127,7 @@ namespace Namotion.Messaging
         public async Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             await Task.Delay(1000).ConfigureAwait(false);
-            await SendAsync(messages, cancellationToken).ConfigureAwait(false);
+            await PublishAsync(messages, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

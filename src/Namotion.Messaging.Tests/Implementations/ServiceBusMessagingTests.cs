@@ -36,5 +36,11 @@ namespace Namotion.Messaging.Tests.Implementations
 
             return messages;
         }
+
+        [Fact(Skip = "Not supported")]
+        public override Task WhenRetrievingMessageCount_ThenCountIsGreaterOrEqualZero()
+        {
+            return base.WhenRetrievingMessageCount_ThenCountIsGreaterOrEqualZero();
+        }
     }
 }

@@ -45,23 +45,23 @@ namespace Namotion.Messaging.Azure.EventHub
         }
 
         /// <inheritdoc/>
-        public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
             await Task.WhenAll(messages
                 .GroupBy(m => m.PartitionId)
-                .Select(g => Task.Run(async () =>
+                .Select(messageGroup => Task.Run(async () =>
                 {
                     var batch = _client.CreateBatch(new BatchOptions
                     {
-                        PartitionKey = g.Key,
+                        PartitionKey = messageGroup.Key,
                         MaxMessageSize = _maxMessageSize
                     });
 
                     try
                     {
-                        foreach (var message in g)
+                        foreach (var message in messageGroup)
                         {
                             if (!batch.TryAdd(CreateEventData(message)))
                             {
@@ -70,7 +70,7 @@ namespace Namotion.Messaging.Azure.EventHub
                                 batch.Dispose();
                                 batch = _client.CreateBatch(new BatchOptions
                                 {
-                                    PartitionKey = g.Key,
+                                    PartitionKey = messageGroup.Key,
                                     MaxMessageSize = _maxMessageSize
                                 });
                             }

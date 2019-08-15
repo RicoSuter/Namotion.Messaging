@@ -22,7 +22,7 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         }
 
         /// <summary>
-        /// Creates a new Storage Queue message publisher.
+        /// Creates a new Azure Storage Queue message publisher.
         /// </summary>
         /// <param name="accountName">The account name.</param>
         /// <param name="storageKey">The storage key.</param>
@@ -49,7 +49,7 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         }
 
         /// <inheritdoc />
-        public async Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 

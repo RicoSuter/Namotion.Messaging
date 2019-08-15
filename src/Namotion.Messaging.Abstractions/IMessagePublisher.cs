@@ -19,6 +19,6 @@ namespace Namotion.Messaging.Abstractions
         /// <summary>
         /// Sends a batch of messages to the queue.
         /// </summary>
-        Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default);
+        Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default);
     }
 }

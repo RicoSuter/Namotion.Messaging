@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\Namotion.Messaging.Amazon.SQS\Namotion.Messaging.Amazon.SQS.csproj" />
     <ProjectReference Include="..\Namotion.Messaging.Azure.EventHub\Namotion.Messaging.Azure.EventHub.csproj" />
     <ProjectReference Include="..\Namotion.Messaging.Azure.ServiceBus\Namotion.Messaging.Azure.ServiceBus.csproj" />
     <ProjectReference Include="..\Namotion.Messaging.Azure.Storage.Queue\Namotion.Messaging.Azure.Storage.Queue.csproj" />

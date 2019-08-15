@@ -23,7 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.Json", "Namotion.Messaging.Json\Namotion.Messaging.Json.csproj", "{2CFAD2FC-ED3F-4F1A-87BA-268FEB19FC96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Messaging.Azure.Storage.Queue", "Namotion.Messaging.Azure.Storage.Queue\Namotion.Messaging.Azure.Storage.Queue.csproj", "{7821255D-7856-47D0-ADCF-2BB9EEF28345}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Messaging.Azure.Storage.Queue", "Namotion.Messaging.Azure.Storage.Queue\Namotion.Messaging.Azure.Storage.Queue.csproj", "{7821255D-7856-47D0-ADCF-2BB9EEF28345}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Namotion.Messaging.Amazon.SQS", "Namotion.Messaging.Amazon.SQS\Namotion.Messaging.Amazon.SQS.csproj", "{D4480351-46A3-4DF2-964B-4C13D1516B0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{7821255D-7856-47D0-ADCF-2BB9EEF28345}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7821255D-7856-47D0-ADCF-2BB9EEF28345}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7821255D-7856-47D0-ADCF-2BB9EEF28345}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4480351-46A3-4DF2-964B-4C13D1516B0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4480351-46A3-4DF2-964B-4C13D1516B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4480351-46A3-4DF2-964B-4C13D1516B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4480351-46A3-4DF2-964B-4C13D1516B0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Version>0.2.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>Namotion</Company>
@@ -14,7 +14,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="2.0.0" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.100.61" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj" />

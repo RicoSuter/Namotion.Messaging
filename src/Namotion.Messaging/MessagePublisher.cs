@@ -23,9 +23,9 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public virtual Task SendAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
+        public virtual Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
-            return _messagePublisher.SendAsync(messages, cancellationToken);
+            return _messagePublisher.PublishAsync(messages, cancellationToken);
         }
 
         /// <inheritdoc/>

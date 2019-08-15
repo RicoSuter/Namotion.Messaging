@@ -73,7 +73,7 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 
 - **IMessagePublisher\<T>**
 - **IMessagePublisher**
-    - `SendAsync(messages, cancellationToken)`: Sends a batch of messages to the queue.
+    - `PublishAsync(messages, cancellationToken)`: Sends a batch of messages to the queue.
 - **IMessageReceiver\<T>**
 - **IMessageReceiver**
     - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
@@ -93,7 +93,7 @@ The idea behind the generic interfaces is to allow multiple instance registratio
 
 Provides extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>` to enable JSON serialization for messages: 
 
-- **SendAsJsonAsync(...):** Sends messages of type T which are serialized to JSON to the queue.
+- **PublishAsJsonAsync(...):** Sends messages of type T which are serialized to JSON to the queue.
 - **ListenAndDeserializeJsonAsync(...):** Receives messages and deserializes their content using the JSON serializer to the `Message<T>.Object` property. If the content could not be deserialized then `Object` is `null`.
 
 Send a JSON encoded message: 
@@ -103,7 +103,7 @@ var publisher = ServiceBusMessagePublisher
     .Create("MyConnectionString", "myqueue")
     .WithMessageType<OrderCreatedMessage>();
 
-await publisher.SendAsJsonAsync(new OrderCreatedMessage { ... });
+await publisher.PublishAsJsonAsync(new OrderCreatedMessage { ... });
 ```
 
 Receive JSON encoded messages:
@@ -128,16 +128,16 @@ await receiver.ListenAndDeserializeJsonAsync(async (messages, ct) =>
 
 The following packages should only be used in the head project, i.e. directly in your application bootstrapping project where the dependency injection container is initialized.
 
-|                       | Azure<br /> Service Bus | Azure<br /> Event Hub     | Azure<br /> Storage Queue | RabbitMQ            | InMemory            |
-|-----------------------|-------------------------|---------------------------|---------------------------|---------------------|---------------------|
-| SendAsync             | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
-| ListenAsync           | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
-| GetMessageCountAsync  | :x:                     | :x:                       | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
-| KeepAliveAsync        | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :x:                 | :heavy_minus_sign:  |
-| ConfirmAsync          | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_minus_sign:  |
-| RejectAsync           | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:  |
-| DeadLetterAsync       | :heavy_check_mark:      | :x: (2.)                  | :x: (2.)                  | :x: (2.)            | :heavy_check_mark:  |
-| User properties       | :heavy_check_mark:      | :heavy_check_mark:        | :x: (3.)                  | :heavy_check_mark:  | :heavy_check_mark:  |
+|                       | Azure<br /> Service Bus | Azure<br /> Event Hub     | Azure<br /> Storage Queue | RabbitMQ            | Amazon SQS           | InMemory            |
+|-----------------------|-------------------------|---------------------------|---------------------------|---------------------|----------------------|---------------------|
+| PublishAsync          | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
+| ListenAsync           | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
+| GetMessageCountAsync  | :x:                     | :x:                       | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
+| KeepAliveAsync        | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :x:                 | :heavy_check_mark:   | :heavy_minus_sign:  |
+| ConfirmAsync          | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_minus_sign:  |
+| RejectAsync           | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
+| DeadLetterAsync       | :heavy_check_mark:      | :x: (2.)                  | :x: (2.)                  | :x: (2.)            | :x: (2.)             | :heavy_check_mark:  |
+| User properties       | :heavy_check_mark:      | :heavy_check_mark:        | :x: (3.)                  | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
 
 1) Because Event Hub is stream based and not transactional, these method calls are just ignored.
 2) Use `receiver.WithDeadLettering(publisher)` to enable dead letter support.
@@ -227,3 +227,21 @@ Behavior:
 Dependencies: 
 
 - [RabbitMQ.Client](https://www.nuget.org/packages/RabbitMQ.Client)
+
+### Namotion.Messaging.Amazon.SQS
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Amazon.SQS.svg)](https://www.nuget.org/packages/Namotion.Messaging.Amazon.SQS/)
+
+Implementations: 
+
+- **AmazonSqsMessagePublisher**
+- **AmazonSqsMessageReceiver**
+
+Behavior: 
+
+- When `handleMessages` throws an exception, then the messages are rejected and later reprocessed.
+- The message's `Content` bytes are serialized to Base64 because SQS can only handle string content.
+
+Dependencies: 
+
+- [AWSSDK.SQS](https://www.nuget.org/packages/AWSSDK.SQS)
