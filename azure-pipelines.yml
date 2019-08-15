@@ -60,7 +60,7 @@ steps:
     versioningScheme: 'off'
   env:
     AwsAccessKeyId: $(AwsAccessKeyId)
-    AwsAccessKey: $(AwsAccessKeyId)
+    AwsAccessKey: $(AwsAccessKey)
     EventHubConnectionString: $(EventHubConnectionString)
     EventHubStorageConnectionString: $(EventHubStorageConnectionString)
     ServiceBusConnectionString: $(ServiceBusConnectionString)
