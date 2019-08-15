@@ -18,7 +18,7 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
             return AmazonSqsMessagePublisher
-                .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
+                .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
                 .WithMessageType<MyMessage>();
         }
     }
