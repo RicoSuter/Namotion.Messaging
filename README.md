@@ -16,7 +16,7 @@ By programming against a messaging abstraction you enable the following scenario
 
 ## Usage
 
-To use the `IMessageReceiver` in a simple command line application, implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
+To use the `IMessageReceiver` in a simple command line application ([.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2)), implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
 
 ```CSharp
 public class MyBackgroundService : BackgroundService
