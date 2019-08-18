@@ -1,6 +1,6 @@
 # Namotion.Messaging
 
-[Namotion.Storage](https://github.com/RicoSuter/Namotion.Storage) | Namotion.Messaging
+[Storage](https://github.com/RicoSuter/Namotion.Storage) | Messaging
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
 [![Azure DevOps](https://img.shields.io/azure-devops/coverage/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
