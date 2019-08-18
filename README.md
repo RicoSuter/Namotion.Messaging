@@ -23,23 +23,34 @@ To use the `IMessageReceiver` in a simple command line application ([.NET Generi
 ```CSharp
 public class MyBackgroundService : BackgroundService
 {
-    private IMessageReceiver _messageReceiver;
+    private readonly IMessageReceiver<MyMessage> _messageReceiver;
+    private readonly ILogger _logger;
 
-    public MyBackgroundService(IMessageReceiver messageReceiver)
+    public MyBackgroundService(IMessageReceiver<MyMessage> messageReceiver, ILogger logger)
     {
         _messageReceiver = messageReceiver;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageReceiver.ListenAsync(ProcessMessagesAsync, stoppingToken);
-    }
+        await _messageReceiver.ListenAndDeserializeJsonAsync(async (messages, ct) =>
+        {
+            foreach (var message in messages)
+            {
+                try
+                {
 
-    private async Task ProcessMessagesAsync(IReadOnlyCollection<Message> messages, CancellationToken cancellationToken)
-    {
-        ...
 
-        await _messageReceiver.ConfirmAsync(messages, cancellationToken);
+                    await _messageReceiver.ConfirmAsync(message, ct);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning(e, $"Error while processing {nameof(MyMessage)} message.");
+                    await _messageReceiver.RejectAsync(message, ct);
+                }
+            }
+        }, stoppingToken);
     }
 }
 ```
