@@ -2,8 +2,8 @@
 
 [Storage](https://github.com/RicoSuter/Namotion.Storage) | Messaging | [Reflection](https://github.com/RicoSuter/Namotion.Reflection)
 
-[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
-[![Azure DevOps](https://img.shields.io/azure-devops/coverage/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/9023bd0a-b641-4e30-9c0f-a7c15e1e080e/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
+[![Azure DevOps](https://img.shields.io/azure-devops/coverage/rsuter/9023bd0a-b641-4e30-9c0f-a7c15e1e080e/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 
