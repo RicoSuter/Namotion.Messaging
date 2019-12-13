@@ -17,6 +17,7 @@ namespace Namotion.Messaging
 
         public async override Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
+            // TODO: Does this require better exception handling?
             await _messagePublisher.PublishAsync(messages, cancellationToken).ConfigureAwait(false);
             await ConfirmAsync(messages, cancellationToken).ConfigureAwait(false);
         }
