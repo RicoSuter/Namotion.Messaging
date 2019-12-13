@@ -117,7 +117,7 @@ namespace Namotion.Messaging.Abstractions
                 catch (Exception e)
                 {
                     logger.LogError(new EventId(), e, "An error occured while listening for messages.");
-                    await Task.Delay(5000);
+                    await Task.Delay(5000, cancellationToken);
                 }
             }
         }
