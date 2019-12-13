@@ -59,7 +59,8 @@ namespace Namotion.Messaging.Azure.ServiceBus
         {
             var message = new Microsoft.Azure.ServiceBus.Message(abstractMessage.Content)
             {
-                MessageId = abstractMessage.Id ?? Guid.NewGuid().ToString()
+                MessageId = abstractMessage.Id ?? Guid.NewGuid().ToString(),
+                SessionId = abstractMessage.PartitionId
             };
 
             foreach (var property in abstractMessage.Properties)
