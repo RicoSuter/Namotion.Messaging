@@ -22,7 +22,7 @@ namespace Namotion.Messaging
 
         /// <summary>
         /// Receives messages, deserializes the JSON in the content and passes the result to the <paramref name="handleMessages"/> callback.
-        /// The task does not complete until the <paramref name="cancellationToken"/> is cancelled.
+        /// The task completes when the listener throws an exception or the <paramref name="cancellationToken"/> is cancelled.
         /// </summary>
         /// <param name="messageReceiver">The message receiver.</param>
         /// <param name="handleMessages">The message handler callback.</param>
@@ -33,7 +33,7 @@ namespace Namotion.Messaging
             Func<IReadOnlyCollection<Message<T>>, CancellationToken, Task> handleMessages,
             CancellationToken cancellationToken = default)
         {
-            return messageReceiver.ListenAsync((messages, ct) => handleMessages(messages.Select(ConvertFromMessage<T>).ToArray(), ct), cancellationToken);
+            return messageReceiver.ListenSingleAsync((messages, ct) => handleMessages(messages.Select(ConvertFromMessage<T>).ToArray(), ct), cancellationToken);
         }
 
         private static Message<T> ConvertFromMessage<T>(Message message)

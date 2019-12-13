@@ -35,7 +35,7 @@ namespace Namotion.Messaging.RabbitMQ
         }
 
         /// <inheritdoc/>
-        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenSingleAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
             if (_channel != null)
