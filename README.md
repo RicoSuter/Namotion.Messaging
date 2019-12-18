@@ -21,8 +21,10 @@ By programming against a messaging abstraction you enable the following scenario
 To listen for messages, create a new message receiver for a specific implementation and call the `ListenWithRetryAsync()` method (this will newer return):
 
 ```csharp
-var receiver = ServiceBusMessageReceiver.Create("MyConnectionString", "myqueue");
-await receiver.ListenWithRetryAsync(async (messages, ct) =>
+IMessageReceiver receiver = ServiceBusMessageReceiver
+	.Create("MyConnectionString", "myqueue");
+
+await receiver.ListenAsync(async (messages, ct) =>
 {
     ...
 }, CancellationToken.None);
@@ -31,7 +33,7 @@ await receiver.ListenWithRetryAsync(async (messages, ct) =>
 In another process or thread you can then publish messages to this listener: 
 
 ```
-var publisher = ServiceBusMessagePublisher
+IMessagePublisher publisher = ServiceBusMessagePublisher
     .Create(configuration["ServiceBusConnectionString"], "myqueue");
 
 await publisher.PublishAsync(new Message(content: new byte[] { 1, 2, 3 }));
