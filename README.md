@@ -34,7 +34,7 @@ public class MyBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageReceiver.ListenAsync(async (messages, ct) =>
+        await _messageReceiver.ListenWithRetryAsync(async (messages, ct) =>
         {
             foreach (var message in messages)
             {
@@ -91,7 +91,8 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **IMessageReceiver\<T>**
 - **IMessageReceiver**
     - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
-    - `ListenAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
+    - `ListenAsync(handleMessages, cancellationToken)`: (Fails when connection cannot be established)
+    - `ListenWithRetryAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
     - `KeepAliveAsync(messages, timeToLive, cancellationToken)`: Extends the message lock timeout on the given messages.
     - `ConfirmAsync(messages, cancellationToken)`: Confirms the processing of messages and removes them from the queue.
     - `RejectAsync(messages, cancellationToken)`: Rejects messages and requeues them for later reprocessing.

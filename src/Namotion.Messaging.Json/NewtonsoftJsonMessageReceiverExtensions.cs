@@ -24,7 +24,7 @@ namespace Namotion.Messaging
 
         /// <summary>
         /// Receives messages, deserializes the JSON in the content and passes the result to the <paramref name="handleMessages"/> callback.
-        /// The task does not complete until the <paramref name="cancellationToken"/> is cancelled.
+        /// The task completes when the listener throws an exception or the <paramref name="cancellationToken"/> is cancelled.
         /// </summary>
         /// <param name="messageReceiver">The message receiver.</param>
         /// <param name="handleMessages">The message handler callback.</param>
@@ -55,6 +55,25 @@ namespace Namotion.Messaging
         {
             return messageReceiver.ListenAsync((messages, ct) =>
                 handleMessages(messages.Select(m => ConvertFromMessage<T>(m, logger)).ToArray(), ct), cancellationToken);
+        }
+
+        /// <summary>
+        /// Receives messages, deserializes the JSON in the content and passes the result to the <paramref name="handleMessages"/> callback.
+        /// The task completes when the listener throws an exception or the <paramref name="cancellationToken"/> is cancelled.
+        /// </summary>
+        /// <param name="messageReceiver">The message receiver.</param>
+        /// <param name="handleMessages">The message handler callback.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
+        public static Task ListenWithRetryAndDeserializeJsonAsync<T>(
+            this IMessageReceiver<T> messageReceiver,
+            Func<IReadOnlyCollection<Message<T>>, CancellationToken, Task> handleMessages,
+            ILogger logger,
+            CancellationToken cancellationToken = default)
+        {
+            return messageReceiver.ListenWithRetryAsync((messages, ct) =>
+                handleMessages(messages.Select(m => ConvertFromMessage<T>(m, logger)).ToArray(), ct), logger, cancellationToken);
         }
 
         private static Message<T> ConvertFromMessage<T>(Message message, ILogger logger)
