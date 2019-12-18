@@ -1,6 +1,9 @@
 # Namotion.Messaging
 
-[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/Namotion/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
+[Storage](https://github.com/RicoSuter/Namotion.Storage) | Messaging | [Reflection](https://github.com/RicoSuter/Namotion.Reflection)
+
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/9023bd0a-b641-4e30-9c0f-a7c15e1e080e/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
+[![Azure DevOps](https://img.shields.io/azure-devops/coverage/rsuter/9023bd0a-b641-4e30-9c0f-a7c15e1e080e/19/master.svg)](https://dev.azure.com/rsuter/Namotion/_build?definitionId=19)
 
 <img align="left" src="https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/Icon.png" width="48px" height="48px">
 
@@ -15,28 +18,39 @@ By programming against a messaging abstraction you enable the following scenario
 
 ## Usage
 
-To use the `IMessageReceiver` in a simple command line application, implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
+To use the `IMessageReceiver` in a simple command line application ([.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2)), implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
 
 ```CSharp
 public class MyBackgroundService : BackgroundService
 {
-    private IMessageReceiver _messageReceiver;
+    private readonly IMessageReceiver _messageReceiver;
+    private readonly ILogger _logger;
 
-    public MyBackgroundService(IMessageReceiver messageReceiver)
+    public MyBackgroundService(IMessageReceiver messageReceiver, ILogger logger)
     {
         _messageReceiver = messageReceiver;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageReceiver.ListenAsync(ProcessMessagesAsync, stoppingToken);
-    }
+        await _messageReceiver.ListenWithRetryAsync(async (messages, ct) =>
+        {
+            foreach (var message in messages)
+            {
+                try
+                {
+                    // TODO: Process message
 
-    private async Task ProcessMessagesAsync(IReadOnlyCollection<Message> messages, CancellationToken cancellationToken)
-    {
-        ...
-
-        await _messageReceiver.ConfirmAsync(messages, cancellationToken);
+                    await _messageReceiver.ConfirmAsync(message, ct);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Error while processing {nameof(MyMessage)} message.");
+                    await _messageReceiver.RejectAsync(message, ct);
+                }
+            }
+        }, stoppingToken);
     }
 }
 ```
@@ -77,7 +91,8 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **IMessageReceiver\<T>**
 - **IMessageReceiver**
     - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
-    - `ListenAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
+    - `ListenAsync(handleMessages, cancellationToken)`: (Fails when connection cannot be established)
+    - `ListenWithRetryAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
     - `KeepAliveAsync(messages, timeToLive, cancellationToken)`: Extends the message lock timeout on the given messages.
     - `ConfirmAsync(messages, cancellationToken)`: Confirms the processing of messages and removes them from the queue.
     - `RejectAsync(messages, cancellationToken)`: Rejects messages and requeues them for later reprocessing.
@@ -189,6 +204,7 @@ Behavior:
 
 - Messages are processed in sequence per partition and can only be retried immediately or be ignored.
 - Exceptions from `handleMessages` are logged and then ignored, i.e. the processing moves forward in the partition.
+- [More info on retries in the message publishing](https://docs.microsoft.com/en-us/azure/architecture/best-practices/retry-service-specific#event-hubs)
 
 Dependencies: 
 

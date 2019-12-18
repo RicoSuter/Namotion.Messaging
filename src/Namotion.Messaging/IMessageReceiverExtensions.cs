@@ -1,4 +1,5 @@
 ﻿using Namotion.Messaging.Abstractions;
+using Namotion.Messaging.Internal;
 
 namespace Namotion.Messaging
 {

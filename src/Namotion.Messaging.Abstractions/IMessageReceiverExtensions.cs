@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,6 +69,57 @@ namespace Namotion.Messaging.Abstractions
             _ = message ?? throw new ArgumentNullException(nameof(message));
 
             return messageReceiver.DeadLetterAsync(new Message[] { message }, reason, errorDescription, cancellationToken);
+        }
+
+        /// <summary>
+        /// Receives messages and passes them to the <paramref name="handleMessages"/> callback.
+        /// The task does not complete until the <paramref name="cancellationToken"/> is cancelled.
+        /// Exceptions of the listener are handled and retried.
+        /// </summary>
+        /// <param name="messageReceiver">The message receiver.</param>
+        /// <param name="handleMessages">The function.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
+        public static Task ListenWithRetryAsync(this IMessageReceiver messageReceiver,
+            Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, 
+            CancellationToken cancellationToken = default)
+        {
+            return ListenWithRetryAsync(messageReceiver, handleMessages, NullLogger.Instance, cancellationToken);
+        }
+
+        /// <summary>
+        /// Receives messages and passes them to the <paramref name="handleMessages"/> callback.
+        /// The task does not complete until the <paramref name="cancellationToken"/> is cancelled.
+        /// Exceptions of the listener are handled and retried.
+        /// </summary>
+        /// <param name="messageReceiver">The message receiver.</param>
+        /// <param name="handleMessages">The function.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
+        public static async Task ListenWithRetryAsync(this IMessageReceiver messageReceiver,
+            Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
+            ILogger logger, CancellationToken cancellationToken = default)
+        {
+            _ = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
+            _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await messageReceiver.ListenAsync(handleMessages, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(new EventId(), e, "An error occured while listening for messages.");
+                    await Task.Delay(5000, cancellationToken);
+                }
+            }
         }
     }
 }

@@ -137,6 +137,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
                 id: message.MessageId,
                 content: message.Body,
                 properties: message.UserProperties.ToDictionary(t => t.Key, t => t.Value),
+                partitionId: message.SessionId,
                 systemProperties: new Dictionary<string, object>
                 {
                     { LockTokenProperty, message.SystemProperties.LockToken },
