@@ -91,6 +91,7 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 - **IMessageReceiver\<T>**
 - **IMessageReceiver**
     - `GetMessageCountAsync(cancellationToken)`: Gets the count of messages waiting to be processed.
+    - `ListenAsync(handleMessages, cancellationToken)`: (Fails when connection cannot be established)
     - `ListenWithRetryAsync(handleMessages, cancellationToken)`: Starts listening and processing messages with the `handleMessages` function until the `cancellationToken` signals a cancellation.
     - `KeepAliveAsync(messages, timeToLive, cancellationToken)`: Extends the message lock timeout on the given messages.
     - `ConfirmAsync(messages, cancellationToken)`: Confirms the processing of messages and removes them from the queue.
