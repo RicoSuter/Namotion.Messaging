@@ -51,7 +51,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public async Task ListenSingleAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
 

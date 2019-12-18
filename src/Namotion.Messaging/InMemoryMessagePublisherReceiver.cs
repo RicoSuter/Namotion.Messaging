@@ -97,7 +97,7 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public async Task ListenSingleAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             try
             {

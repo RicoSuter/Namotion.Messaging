@@ -24,9 +24,9 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public virtual Task ListenSingleAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public virtual Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
-            return _messageReceiver.ListenSingleAsync(handleMessages, cancellationToken);
+            return _messageReceiver.ListenAsync(handleMessages, cancellationToken);
         }
 
         /// <inheritdoc/>

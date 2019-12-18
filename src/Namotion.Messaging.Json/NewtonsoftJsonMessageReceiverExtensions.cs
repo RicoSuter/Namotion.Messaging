@@ -53,7 +53,7 @@ namespace Namotion.Messaging
             ILogger logger,
             CancellationToken cancellationToken = default)
         {
-            return messageReceiver.ListenAsync((messages, ct) =>
+            return messageReceiver.ListenWithRetryAsync((messages, ct) =>
                 handleMessages(messages.Select(m => ConvertFromMessage<T>(m, logger)).ToArray(), ct), cancellationToken);
         }
 

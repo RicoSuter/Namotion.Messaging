@@ -80,11 +80,11 @@ namespace Namotion.Messaging.Abstractions
         /// <param name="handleMessages">The function.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static Task ListenAsync(this IMessageReceiver messageReceiver,
+        public static Task ListenWithRetryAsync(this IMessageReceiver messageReceiver,
             Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, 
             CancellationToken cancellationToken = default)
         {
-            return ListenAsync(messageReceiver, handleMessages, NullLogger.Instance, cancellationToken);
+            return ListenWithRetryAsync(messageReceiver, handleMessages, NullLogger.Instance, cancellationToken);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Namotion.Messaging.Abstractions
         /// <param name="logger">The logger.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
-        public static async Task ListenAsync(this IMessageReceiver messageReceiver,
+        public static async Task ListenWithRetryAsync(this IMessageReceiver messageReceiver,
             Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
             ILogger logger, CancellationToken cancellationToken = default)
         {
@@ -108,7 +108,7 @@ namespace Namotion.Messaging.Abstractions
             {
                 try
                 {
-                    await messageReceiver.ListenSingleAsync(handleMessages, cancellationToken);
+                    await messageReceiver.ListenAsync(handleMessages, cancellationToken);
                 }
                 catch (TaskCanceledException)
                 {

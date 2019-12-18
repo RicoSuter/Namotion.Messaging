@@ -70,7 +70,7 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         }
 
         /// <inheritdoc/>
-        public async Task ListenSingleAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
 
