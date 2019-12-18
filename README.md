@@ -204,6 +204,7 @@ Behavior:
 
 - Messages are processed in sequence per partition and can only be retried immediately or be ignored.
 - Exceptions from `handleMessages` are logged and then ignored, i.e. the processing moves forward in the partition.
+- [More info on retries in the message publishing](https://docs.microsoft.com/en-us/azure/architecture/best-practices/retry-service-specific#event-hubs)
 
 Dependencies: 
 

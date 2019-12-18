@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging
+namespace Namotion.Messaging.Internal
 {
     internal class DeadLetterQueuePublisherReceiver<T> : MessageReceiver<T>
     {
