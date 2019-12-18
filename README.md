@@ -32,7 +32,7 @@ await receiver.ListenAsync(async (messages, ct) =>
 
 In another process or thread you can then publish messages to this listener: 
 
-```
+```csharp
 IMessagePublisher publisher = ServiceBusMessagePublisher
     .Create(configuration["ServiceBusConnectionString"], "myqueue");
 
