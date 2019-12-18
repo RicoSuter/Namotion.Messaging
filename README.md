@@ -146,7 +146,7 @@ The following packages should only be used in the head project, i.e. directly in
 |                       | Azure<br /> Service Bus | Azure<br /> Event Hub     | Azure<br /> Storage Queue | RabbitMQ            | Amazon SQS           | InMemory            |
 |-----------------------|-------------------------|---------------------------|---------------------------|---------------------|----------------------|---------------------|
 | PublishAsync          | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
-| ListenWithRetryAsync           | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
+| ListenAsync           | :heavy_check_mark:      | :heavy_check_mark:        | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
 | GetMessageCountAsync  | :x:                     | :x:                       | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_check_mark:  |
 | KeepAliveAsync        | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :x:                 | :heavy_check_mark:   | :heavy_minus_sign:  |
 | ConfirmAsync          | :heavy_check_mark:      | :heavy_minus_sign: (1.)   | :heavy_check_mark:        | :heavy_check_mark:  | :heavy_check_mark:   | :heavy_minus_sign:  |
