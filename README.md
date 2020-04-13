@@ -18,7 +18,28 @@ By programming against a messaging abstraction you enable the following scenario
 
 ## Usage
 
-To use the `IMessageReceiver` in a simple command line application ([.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2)), implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
+To listen for messages, create a new message receiver for a specific implementation and call the `ListenWithRetryAsync()` method (this will newer return):
+
+```csharp
+IMessageReceiver receiver = ServiceBusMessageReceiver
+	.Create("MyConnectionString", "myqueue");
+
+await receiver.ListenAsync(async (messages, ct) =>
+{
+    ...
+}, CancellationToken.None);
+```
+
+In another process or thread you can then publish messages to this listener: 
+
+```csharp
+IMessagePublisher publisher = ServiceBusMessagePublisher
+    .Create(configuration["ServiceBusConnectionString"], "myqueue");
+
+await publisher.PublishAsync(new Message(content: new byte[] { 1, 2, 3 }));
+```
+
+However, you should host the listener with a .NET generic host which provides dependency injection, configuration and logging. To use the `IMessageReceiver` in a simple command line application ([.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2)), implement a new `BackgroundService` and start message processing in `ExecuteAsync`:
 
 ```CSharp
 public class MyBackgroundService : BackgroundService
