@@ -201,7 +201,7 @@ Extension methods to enhance or modify instances:
 
 Extension methods to enhance or modify instances: 
 
-- **WithLargeMessageStorage(blobContainer, maxMessageLength)** and **WithLargeMessageStorage(blobContainer)**: Write and read large messages from a [Namotion.Storage](https://github.com/RicoSuter/Namotion.Storage) blob container (e.g. Azure Blob Storage).
+- **WithLargeMessageStorage(blobContainer, maxMessageLength)** and **WithLargeMessageStorage(blobContainer)**: Write and read large message contents from a [Namotion.Storage](https://github.com/RicoSuter/Namotion.Storage) blob container (e.g. Azure Blob Storage).
 
 Dependencies: 
 
