@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Version>0.4.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>Namotion</Company>
+    <Authors>Rico Suter</Authors>
+    <Copyright>Copyright © Rico Suter, 2019</Copyright>
+    <PackageIconUrl>https://raw.githubusercontent.com/RicoSuter/Namotion.Reflection/master/assets/NuGetIcon.png</PackageIconUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>.NET library with message queue abstractions.</Description>
+    <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Messaging</PackageProjectUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>true</WarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Namotion.Storage.Abstractions" Version="0.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\Namotion.Messaging\Namotion.Messaging.csproj" />
+  </ItemGroup>
+</Project>
