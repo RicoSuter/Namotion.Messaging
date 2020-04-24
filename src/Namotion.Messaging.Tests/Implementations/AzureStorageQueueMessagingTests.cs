@@ -9,16 +9,16 @@ namespace Namotion.Messaging.Tests.Implementations
 {
     public class AzureStorageQueueMessagingTests : MessagingTestsBase
     {
-        protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
+        protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
-            return AzureStorageQueueReceiver
+            return AzureStorageQueuePublisher
                 .CreateFromConnectionString(configuration["EventHubStorageConnectionString"], "myqueue")
                 .WithMessageType<MyMessage>();
         }
 
-        protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
+        protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
-            return AzureStorageQueuePublisher
+            return AzureStorageQueueReceiver
                 .CreateFromConnectionString(configuration["EventHubStorageConnectionString"], "myqueue")
                 .WithMessageType<MyMessage>();
         }

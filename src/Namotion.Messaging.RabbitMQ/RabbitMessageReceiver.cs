@@ -63,7 +63,7 @@ namespace Namotion.Messaging.RabbitMQ
                 {
                     var message = new Message(
                         id: a.BasicProperties.MessageId,
-                        content: a.Body,
+                        content: a.Body.ToArray(),
                         systemProperties: new Dictionary<string, object>
                         {
                             { DeliveryTagProperty, a.DeliveryTag }
