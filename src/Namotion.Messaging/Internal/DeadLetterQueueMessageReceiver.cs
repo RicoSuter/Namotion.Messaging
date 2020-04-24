@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Namotion.Messaging.Internal
 {
-    internal class DeadLetterQueuePublisherReceiver<T> : MessageReceiver<T>
+    internal class DeadLetterQueueMessageReceiver<T> : MessageReceiver<T>
     {
         private readonly IMessagePublisher _messagePublisher;
 
-        public DeadLetterQueuePublisherReceiver(IMessageReceiver messageReceiver, IMessagePublisher messagePublisher)
+        public DeadLetterQueueMessageReceiver(IMessageReceiver messageReceiver, IMessagePublisher messagePublisher)
             : base(messageReceiver)
         {
             _messagePublisher = messagePublisher;

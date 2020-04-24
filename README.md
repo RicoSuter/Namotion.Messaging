@@ -193,6 +193,7 @@ Extension methods to enhance or modify instances:
 
 - **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
 - **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
+- **WithGZipCompression(messagePublisher, compressionLevel)** and **WithGZipCompression(messageReceiver)**: Automatically compresses and decompresses the message body with GZip (must be registered on the publisher and receiver).
 
 ### Namotion.Messaging.Azure.ServiceBus
 
