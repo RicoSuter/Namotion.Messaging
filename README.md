@@ -197,9 +197,15 @@ Extension methods to enhance or modify instances:
 
 ### Namotion.Messaging.Storage
 
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Storage.svg)](https://www.nuget.org/packages/Namotion.Messaging.Storage/)
+
 Extension methods to enhance or modify instances: 
 
 - **WithLargeMessageStorage(blobContainer, maxMessageLength)** and **WithLargeMessageStorage(blobContainer)**: Write and read large messages from a [Namotion.Storage](https://github.com/RicoSuter/Namotion.Storage) blob container (e.g. Azure Blob Storage).
+
+Dependencies: 
+
+- [Namotion.Storage](https://www.nuget.org/packages/Namotion.Storage/)
 
 ### Namotion.Messaging.Azure.ServiceBus
 
