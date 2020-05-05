@@ -137,6 +137,10 @@ Extension methods to enhance or modify instances:
 - **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
 - **WithGZipCompression(compressionLevel)** and **WithGZipCompression()**: Automatically compresses and decompresses the message body with GZip (must be registered on the publisher and receiver).
 
+Other extension methods: 
+
+- **ProcessByPartitionKeyAsync**: [Azure Event Hubs: Improve scalability with batch parallelization](https://blog.rsuter.com/azure-event-hubs-improve-scalability-with-batch-parallelization/)
+
 ### Namotion.Messaging.Storage
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Storage.svg)](https://www.nuget.org/packages/Namotion.Messaging.Storage/)
