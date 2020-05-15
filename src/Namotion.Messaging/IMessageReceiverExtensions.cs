@@ -56,7 +56,7 @@ namespace Namotion.Messaging
         /// <typeparam name="T">The message type.</typeparam>
         /// <param name="messageReceiver">The message receiver.</param>
         /// <returns>The wrapped message receiver.</returns>
-        public static IMessageReceiver<T> AsPublisher<T>(this IMessageReceiver messageReceiver)
+        public static IMessageReceiver<T> AsReceiver<T>(this IMessageReceiver messageReceiver)
         {
             return new MessageReceiver<T>(messageReceiver);
         }
@@ -67,7 +67,7 @@ namespace Namotion.Messaging
         /// <typeparam name="T">The message type.</typeparam>
         /// <param name="messageReceiver">The message receiver.</param>
         /// <returns>The wrapped message receiver.</returns>
-        public static IMessageReceiver AsPublisher(this IMessageReceiver messageReceiver)
+        public static IMessageReceiver AsReceiver(this IMessageReceiver messageReceiver)
         {
             return messageReceiver;
         }

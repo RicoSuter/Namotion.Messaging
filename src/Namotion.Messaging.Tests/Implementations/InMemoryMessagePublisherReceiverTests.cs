@@ -19,7 +19,7 @@ namespace Namotion.Messaging.Tests.Implementations
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
-            return ((IMessageReceiver)_publisherReceiver).AsPublisher<MyMessage>();
+            return ((IMessageReceiver)_publisherReceiver).AsReceiver<MyMessage>();
         }
     }
 }

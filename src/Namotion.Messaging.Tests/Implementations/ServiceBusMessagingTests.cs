@@ -20,7 +20,7 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             return ServiceBusMessageReceiver
                 .Create(configuration["ServiceBusConnectionString"], "myqueue")
-                .AsPublisher<MyMessage>();
+                .AsReceiver<MyMessage>();
         }
 
         public override async Task<List<Message>> WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()
