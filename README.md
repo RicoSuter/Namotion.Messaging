@@ -133,7 +133,8 @@ Contains common helper methods and base implementations of the abstractions:
 
 Extension methods to enhance or modify instances: 
 
-- **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
+- **AsPublisher\<T>():**
+- **AsReceiver\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
 - **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
 - **WithGZipCompression(compressionLevel)** and **WithGZipCompression()**: Automatically compresses and decompresses the message body with GZip (must be registered on the publisher and receiver).
 
@@ -167,7 +168,7 @@ Send a JSON encoded message:
 ```CSharp
 var publisher = ServiceBusMessagePublisher
     .Create("MyConnectionString", "myqueue")
-    .WithMessageType<OrderCreatedMessage>();
+    .AsPublisher<OrderCreatedMessage>();
 
 await publisher.PublishAsJsonAsync(new OrderCreatedMessage { ... });
 ```
@@ -177,7 +178,7 @@ Receive JSON encoded messages:
 ```CSharp
 var receiver = ServiceBusMessageReceiver
     .Create("MyConnectionString", "myqueue")
-    .WithMessageType<OrderCreatedMessage>();
+    .AsReceiver<OrderCreatedMessage>();
 
 await receiver.ListenAndDeserializeJsonAsync(async (messages, ct) => 
 {
