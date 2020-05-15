@@ -20,7 +20,7 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             return AzureStorageQueueReceiver
                 .CreateFromConnectionString(configuration["EventHubStorageConnectionString"], "myqueue")
-                .AsPublisher<MyMessage>();
+                .AsReceiver<MyMessage>();
         }
 
         [Fact(Skip = "Azure Storage Queue does not support properties.")]

@@ -19,7 +19,7 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             return AmazonSqsMessageReceiver
                 .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
-                .AsPublisher<MyMessage>();
+                .AsReceiver<MyMessage>();
         }
     }
 }

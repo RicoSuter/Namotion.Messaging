@@ -28,7 +28,7 @@ namespace Namotion.Messaging.Tests
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return ((IMessageReceiver)_publisherReceiver)
-                .AsPublisher<MyMessage>()
+                .AsReceiver<MyMessage>()
                 .WithLargeMessageStorage(_blobContainer);
         }
 
