@@ -123,6 +123,36 @@ Contains the messaging abstractions, mainly interfaces with a very small footpri
 
 The idea behind the generic interfaces is to allow multiple instance registrations, read [Dependency Injection in .NET: A way to work around missing named registrations](https://blog.rsuter.com/dotnet-dependency-injection-way-to-work-around-missing-named-registrations/) for more information.
 
+### Namotion.Messaging
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
+
+Contains common helper methods and base implementations of the abstractions:
+
+- **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments (i.e. use this implementation when no connection strings are defined).
+
+Extension methods to enhance or modify instances: 
+
+- **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
+- **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
+- **WithGZipCompression(compressionLevel)** and **WithGZipCompression()**: Automatically compresses and decompresses the message body with GZip (must be registered on the publisher and receiver).
+
+Other extension methods: 
+
+- **ProcessByPartitionKeyAsync**: [Azure Event Hubs: Improve scalability with batch parallelization](https://blog.rsuter.com/azure-event-hubs-improve-scalability-with-batch-parallelization/)
+
+### Namotion.Messaging.Storage
+
+[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Storage.svg)](https://www.nuget.org/packages/Namotion.Messaging.Storage/)
+
+Extension methods to enhance or modify instances: 
+
+- **WithLargeMessageStorage(blobContainer, maxMessageLength)** and **WithLargeMessageStorage(blobContainer)**: Write and read large message contents from a [Namotion.Storage](https://github.com/RicoSuter/Namotion.Storage) blob container (e.g. Azure Blob Storage).
+
+Dependencies: 
+
+- [Namotion.Storage](https://www.nuget.org/packages/Namotion.Storage/)
+
 ### Namotion.Messaging.Json
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
@@ -180,26 +210,6 @@ The following packages should only be used in the head project, i.e. directly in
 3) Use `receiver.WithPropertiesInContent()` to enable user properties support (not implemented yet).
 
 :heavy_minus_sign: = Noop/Ignored
-
-### Namotion.Messaging
-
-[![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
-
-Contains common helper methods and base implementations of the abstractions:
-
-- **InMemoryMessagePublisherReceiver:** In-memory message publisher and receiver for integration tests and dependency free local development environments (i.e. use this implementation when no connection strings are defined).
-
-Extension methods to enhance or modify instances: 
-
-- **WithMessageType\<T>():** Changes the type of the interface from `IMessagePublisher`/`IMessageReceiver` to `IMessagePublisher<T>`/`IMessageReceiver<T>`.
-- **WithDeadLettering(messagePublisher):** Adds support for a custom dead letter queue, i.e. a call to `DeadLetterAsync()` will confirm the message and publish it to the specified `messagePublisher`.
-- **WithGZipCompression(compressionLevel)** and **WithGZipCompression()**: Automatically compresses and decompresses the message body with GZip (must be registered on the publisher and receiver).
-
-### Namotion.Messaging.Storage
-
-Extension methods to enhance or modify instances: 
-
-- **WithLargeMessageStorage(blobContainer, maxMessageLength)** and **WithLargeMessageStorage(blobContainer)**: Write and read large messages from a [Namotion.Storage](https://github.com/RicoSuter/Namotion.Storage) blob container (e.g. Azure Blob Storage).
 
 ### Namotion.Messaging.Azure.ServiceBus
 

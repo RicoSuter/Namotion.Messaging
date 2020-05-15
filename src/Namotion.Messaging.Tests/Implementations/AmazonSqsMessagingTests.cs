@@ -12,14 +12,14 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             return AmazonSqsMessagePublisher
                 .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
-                .WithMessageType<MyMessage>();
+                .AsPublisher<MyMessage>();
         }
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return AmazonSqsMessageReceiver
                 .Create(new AmazonSQSClient(configuration["AwsAccessKeyId"], configuration["AwsAccessKey"], RegionEndpoint.EUCentral1), "namotionqueue")
-                .WithMessageType<MyMessage>();
+                .AsPublisher<MyMessage>();
         }
     }
 }

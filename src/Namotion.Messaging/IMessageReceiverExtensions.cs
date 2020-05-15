@@ -56,9 +56,20 @@ namespace Namotion.Messaging
         /// <typeparam name="T">The message type.</typeparam>
         /// <param name="messageReceiver">The message receiver.</param>
         /// <returns>The wrapped message receiver.</returns>
-        public static IMessageReceiver<T> WithMessageType<T>(this IMessageReceiver messageReceiver)
+        public static IMessageReceiver<T> AsPublisher<T>(this IMessageReceiver messageReceiver)
         {
             return new MessageReceiver<T>(messageReceiver);
+        }
+
+        /// <summary>
+        /// Adds a generic message type to the message receiver.
+        /// </summary>
+        /// <typeparam name="T">The message type.</typeparam>
+        /// <param name="messageReceiver">The message receiver.</param>
+        /// <returns>The wrapped message receiver.</returns>
+        public static IMessageReceiver AsPublisher(this IMessageReceiver messageReceiver)
+        {
+            return messageReceiver;
         }
     }
 }
