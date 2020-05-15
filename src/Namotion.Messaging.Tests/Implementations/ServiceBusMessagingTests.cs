@@ -13,14 +13,14 @@ namespace Namotion.Messaging.Tests.Implementations
         {
             return ServiceBusMessagePublisher
                 .Create(configuration["ServiceBusConnectionString"], "myqueue")
-                .WithMessageType<MyMessage>();
+                .AsPublisher<MyMessage>();
         }
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return ServiceBusMessageReceiver
                 .Create(configuration["ServiceBusConnectionString"], "myqueue")
-                .WithMessageType<MyMessage>();
+                .AsPublisher<MyMessage>();
         }
 
         public override async Task<List<Message>> WhenSendingMessages_ThenMessagesWithPropertisShouldBeReceived()

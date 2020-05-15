@@ -37,9 +37,20 @@ namespace Namotion.Messaging
         /// <typeparam name="T">The message type.</typeparam>
         /// <param name="messagePublisher">The message publisher.</param>
         /// <returns>The wrapped message publisher.</returns>
-        public static IMessagePublisher<T> WithMessageType<T>(this IMessagePublisher messagePublisher)
+        public static IMessagePublisher<T> AsPublisher<T>(this IMessagePublisher messagePublisher)
         {
             return new MessagePublisher<T>(messagePublisher);
+        }
+
+        /// <summary>
+        /// Adds a generic message type to the message publisher.
+        /// </summary>
+        /// <typeparam name="T">The message type.</typeparam>
+        /// <param name="messagePublisher">The message publisher.</param>
+        /// <returns>The wrapped message publisher.</returns>
+        public static IMessagePublisher AsPublisher(this IMessagePublisher messagePublisher)
+        {
+            return messagePublisher;
         }
     }
 }

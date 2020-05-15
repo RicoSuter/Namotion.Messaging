@@ -18,14 +18,14 @@ namespace Namotion.Messaging.Tests
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
             return ((IMessagePublisher)_publisherReceiver)
-                .WithMessageType<MyMessage>()
+                .AsPublisher<MyMessage>()
                 .WithGZipCompression(CompressionLevel.NoCompression);
         }
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return ((IMessageReceiver)_publisherReceiver)
-                .WithMessageType<MyMessage>()
+                .AsPublisher<MyMessage>()
                 .WithGZipCompression();
         }
 
