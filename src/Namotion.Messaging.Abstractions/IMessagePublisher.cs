@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging.Abstractions
+namespace Namotion.Messaging
 {
     /// <summary>
     /// Publishes messages to a message queue, broker or data ingestion system.

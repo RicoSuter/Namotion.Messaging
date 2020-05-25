@@ -1,5 +1,4 @@
-﻿using Namotion.Messaging.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;

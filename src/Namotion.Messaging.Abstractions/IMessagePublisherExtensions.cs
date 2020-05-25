@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging.Abstractions
+namespace Namotion.Messaging
 {
     /// <summary>
     /// <see cref="IMessagePublisher"/> extension methods.

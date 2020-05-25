@@ -1,5 +1,4 @@
-﻿using Namotion.Messaging.Abstractions;
-using Namotion.Messaging.Storage.Internal;
+﻿using Namotion.Messaging.Storage.Internal;
 using Namotion.Storage.Abstractions;
 
 namespace Namotion.Messaging

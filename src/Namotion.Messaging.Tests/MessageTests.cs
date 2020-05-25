@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using Namotion.Messaging.Abstractions;
 
 namespace Namotion.Messaging.Tests
 {

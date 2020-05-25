@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Namotion.Messaging.Abstractions;
 
 namespace Namotion.Messaging.Tests.Implementations
 {

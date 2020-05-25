@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Queue;
-using Namotion.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

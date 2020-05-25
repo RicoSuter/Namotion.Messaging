@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
-using Namotion.Messaging.Abstractions;
 
 namespace Namotion.Messaging.Azure.ServiceBus
 {
@@ -42,7 +41,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public async Task PublishAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
@@ -55,7 +54,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
             _client.CloseAsync().GetAwaiter().GetResult();
         }
 
-        private Microsoft.Azure.ServiceBus.Message CreateMessage(Abstractions.Message abstractMessage)
+        private Microsoft.Azure.ServiceBus.Message CreateMessage(Message abstractMessage)
         {
             var message = new Microsoft.Azure.ServiceBus.Message(abstractMessage.Content)
             {

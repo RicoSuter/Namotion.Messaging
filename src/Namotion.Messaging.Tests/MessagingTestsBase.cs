@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Xunit;
-using Namotion.Messaging.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;

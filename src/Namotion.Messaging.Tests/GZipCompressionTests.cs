@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Namotion.Messaging.Abstractions;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using Xunit;

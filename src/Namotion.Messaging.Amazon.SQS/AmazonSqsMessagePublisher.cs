@@ -1,6 +1,5 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
-using Namotion.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +36,7 @@ namespace Namotion.Messaging.Amazon.SQS
         }
 
         /// <inheritdoc/>
-        public async Task PublishAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             var batch = new SendMessageBatchRequest
             {

@@ -1,5 +1,4 @@
 using Xunit;
-using Namotion.Messaging.Abstractions;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Namotion.Messaging.Azure.ServiceBus;

@@ -1,6 +1,5 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
-using Namotion.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +45,7 @@ namespace Namotion.Messaging.Amazon.SQS
         }
 
         /// <inheritdoc/>
-        public async Task ListenAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
 
@@ -88,7 +87,7 @@ namespace Namotion.Messaging.Amazon.SQS
         }
 
         /// <inheritdoc/>
-        public async Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public async Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
@@ -104,7 +103,7 @@ namespace Namotion.Messaging.Amazon.SQS
         }
 
         /// <inheritdoc/>
-        public Task DeadLetterAsync(IEnumerable<Abstractions.Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
@@ -122,7 +121,7 @@ namespace Namotion.Messaging.Amazon.SQS
         }
 
         /// <inheritdoc/>
-        public async Task KeepAliveAsync(IEnumerable<Abstractions.Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public async Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             var response = await _client.ChangeMessageVisibilityBatchAsync(new ChangeMessageVisibilityBatchRequest
             {
@@ -137,7 +136,7 @@ namespace Namotion.Messaging.Amazon.SQS
         }
 
         /// <inheritdoc/>
-        public async Task RejectAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public async Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             var response = await _client.ChangeMessageVisibilityBatchAsync(new ChangeMessageVisibilityBatchRequest
             {
@@ -162,9 +161,9 @@ namespace Namotion.Messaging.Amazon.SQS
             return _queueUrl;
         }
 
-        private Abstractions.Message ConvertToMessage(global::Amazon.SQS.Model.Message message)
+        private Message ConvertToMessage(global::Amazon.SQS.Model.Message message)
         {
-            return new Abstractions.Message(
+            return new Message(
                 id: message.MessageId,
                 content: Convert.FromBase64String(message.Body),
                 properties: message.MessageAttributes.ToDictionary(a => a.Key, a => (object)a.Value.StringValue),

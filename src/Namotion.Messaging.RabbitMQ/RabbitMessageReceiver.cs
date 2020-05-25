@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Namotion.Messaging.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 

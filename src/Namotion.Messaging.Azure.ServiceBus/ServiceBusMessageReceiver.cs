@@ -11,7 +11,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
     /// <summary>
     /// A Service Bus message receiver.
     /// </summary>
-    public class ServiceBusMessageReceiver : Abstractions.IMessageReceiver
+    public class ServiceBusMessageReceiver : IMessageReceiver
     {
         private const string LockTokenProperty = "LockToken";
         private const string DeliveryCountProperty = "DeliveryCount";
@@ -31,7 +31,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <param name="messageReceiver">The message receiver.</param>
         /// <param name="maxMessageCount">The maximum message count (default: 1).</param>
         /// <returns>The message publisher.</returns>
-        public static Abstractions.IMessageReceiver CreateFromMessageReceiver(MessageReceiver messageReceiver, int maxMessageCount = 1)
+        public static IMessageReceiver CreateFromMessageReceiver(MessageReceiver messageReceiver, int maxMessageCount = 1)
         {
             return new ServiceBusMessageReceiver(messageReceiver, maxMessageCount);
         }
@@ -44,14 +44,14 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <param name="receiveMode">The receive mode (default: PeekLock).</param>
         /// <param name="maxBatchSize">The maximum batch size (default: 1).</param>
         /// <returns>The message publisher.</returns>
-        public static Abstractions.IMessageReceiver Create(
+        public static IMessageReceiver Create(
             string connectionString, string entityPath, ReceiveMode receiveMode = ReceiveMode.PeekLock, int maxBatchSize = 1)
         {
             return new ServiceBusMessageReceiver(new MessageReceiver(connectionString, entityPath, receiveMode), maxBatchSize);
         }
 
         /// <inheritdoc/>
-        public async Task ListenAsync(Func<IReadOnlyCollection<Abstractions.Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
+        public async Task ListenAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken = default)
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
 
@@ -91,7 +91,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public Task KeepAliveAsync(IEnumerable<Abstractions.Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
+        public Task KeepAliveAsync(IEnumerable<Message> messages, TimeSpan? timeToLive = null, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
@@ -102,7 +102,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public Task ConfirmAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public Task ConfirmAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
@@ -110,7 +110,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public Task RejectAsync(IEnumerable<Abstractions.Message> messages, CancellationToken cancellationToken = default)
+        public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
@@ -121,7 +121,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
         }
 
         /// <inheritdoc/>
-        public Task DeadLetterAsync(IEnumerable<Abstractions.Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
+        public Task DeadLetterAsync(IEnumerable<Message> messages, string reason, string errorDescription, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
@@ -131,9 +131,9 @@ namespace Namotion.Messaging.Azure.ServiceBus
             }));
         }
 
-        private Abstractions.Message ConvertToMessage(Message message)
+        private Message ConvertToMessage(Microsoft.Azure.ServiceBus.Message message)
         {
-            return new Abstractions.Message(
+            return new Message(
                 id: message.MessageId,
                 content: message.Body,
                 properties: message.UserProperties.ToDictionary(t => t.Key, t => t.Value),

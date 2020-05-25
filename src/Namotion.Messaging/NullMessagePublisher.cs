@@ -1,5 +1,4 @@
-﻿using Namotion.Messaging.Abstractions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
