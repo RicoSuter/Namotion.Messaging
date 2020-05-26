@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Namotion.Messaging.Abstractions;
 using Namotion.Storage;
 using Namotion.Storage.Abstractions;
 using System.Collections.Generic;

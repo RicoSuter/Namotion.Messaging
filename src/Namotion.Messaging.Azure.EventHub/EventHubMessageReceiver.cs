@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Extensions.Logging;
-using Namotion.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

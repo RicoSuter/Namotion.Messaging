@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Namotion.Messaging.Abstractions
+namespace Namotion.Messaging
 {
     /// <summary>
     /// A generic message with deserialized content to be used in all queue implementations.

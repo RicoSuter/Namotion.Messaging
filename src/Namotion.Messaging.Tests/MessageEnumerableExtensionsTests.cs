@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using Namotion.Messaging.Abstractions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;

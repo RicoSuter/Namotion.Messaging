@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Namotion.Messaging.Abstractions
+namespace Namotion.Messaging
 {
     /// <summary>
     /// <see cref="IMessagePublisher"/> extension methods.
@@ -81,10 +81,10 @@ namespace Namotion.Messaging.Abstractions
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
         public static Task ListenWithRetryAsync(this IMessageReceiver messageReceiver,
-            Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, 
+            Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
             CancellationToken cancellationToken = default)
         {
-            return ListenWithRetryAsync(messageReceiver, handleMessages, NullLogger.Instance, cancellationToken);
+            return messageReceiver.ListenWithRetryAsync(handleMessages, NullLogger.Instance, cancellationToken);
         }
 
         /// <summary>

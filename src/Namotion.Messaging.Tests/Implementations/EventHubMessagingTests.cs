@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs.Processor;
 using Microsoft.Extensions.Configuration;
-using Namotion.Messaging.Abstractions;
 using Namotion.Messaging.Azure.EventHub;
 using Xunit;
 

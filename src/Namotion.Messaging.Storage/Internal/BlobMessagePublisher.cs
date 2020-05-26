@@ -1,5 +1,4 @@
-﻿using Namotion.Messaging.Abstractions;
-using Namotion.Storage.Abstractions;
+﻿using Namotion.Storage.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

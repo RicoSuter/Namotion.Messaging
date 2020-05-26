@@ -1,5 +1,4 @@
-﻿using Namotion.Messaging.Abstractions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Namotion.Messaging.Amazon.SQS;
 using Amazon.SQS;
 using Amazon;

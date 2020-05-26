@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
-    <Version>0.7.1</Version>
+    <Version>0.7.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>Namotion</Company>
     <Authors>Rico Suter</Authors>
@@ -12,6 +12,7 @@
     <PackageProjectUrl>https://github.com/RicoSuter/Namotion.Messaging</PackageProjectUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>true</WarningsAsErrors>
+    <RootNamespace>Namotion.Messaging</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
