@@ -71,7 +71,7 @@ namespace Namotion.Messaging
                     .ToArray());
 
             var tasks = Enumerable
-                .Range(0, partitionParallelization)
+                .Range(0, Math.Min(deserializedMessages.Length, partitionParallelization))
                 .Select(i => Task.Run(async () =>
                 {
                     while (batchPartitionsQueue.TryDequeue(out var batchPartition))

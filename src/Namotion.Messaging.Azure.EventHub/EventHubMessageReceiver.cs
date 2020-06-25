@@ -229,7 +229,20 @@ namespace Namotion.Messaging.Azure.EventHub
 
             public Task ProcessErrorAsync(PartitionContext context, Exception error)
             {
-                _logger.LogError(error, "Error in partition {PartitionId} processor.", context.PartitionId);
+                if (error is ReceiverDisconnectedException)
+                {
+                    _logger.LogInformation(error, "Receiver for partition has stopped receiving " +
+                        "messages because another process has taken over the lease " +
+                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.", 
+                        context.ConsumerGroupName, context.EventHubPath, context.PartitionId);
+                }
+                else
+                {
+                    _logger.LogWarning(error, "Unable to process events " +
+                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.", 
+                        context.ConsumerGroupName, context.EventHubPath, context.PartitionId);
+                }
+
                 return Task.CompletedTask;
             }
 
