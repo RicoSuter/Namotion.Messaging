@@ -56,59 +56,7 @@ namespace Namotion.Messaging
             _deadLetterQueue = new Collection<Message>();
             _consumers = new ConcurrentDictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken>();
 
-            _backgroundTask = Task.Run(async () =>
-            {
-                while (!_shutdownTokenSource.Token.IsCancellationRequested)
-                {
-                    await _processingTriggerEvent.WaitAsync(_shutdownTokenSource.Token);
-
-                    if (_consumers.Any())
-                    {
-                        _notProcessingEvent.Reset();
-                        try
-                        {
-                            while (!_shutdownTokenSource.Token.IsCancellationRequested)
-                            {
-                                var messages = new List<Message>();
-                                while (messages.Count < maxBatchSize && _queue.TryDequeue(out var msg))
-                                {
-                                    messages.Add(msg);
-                                }
-
-                                if (messages.Count != 0)
-                                {
-                                    var tasks = _consumers.Select(f => Task.Run(() =>
-                                    {
-                                        try
-                                        {
-                                            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(_shutdownTokenSource.Token, f.Value);
-                                            return f.Key(messages, cancellationSource.Token);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            if (!(e is TaskCanceledException))
-                                            {
-                                                this._logger.LogError(e, "An error occurred in the in-memory message receiver.");
-                                            }
-
-                                            return Task.CompletedTask;
-                                        }
-                                    }));
-                                    await Task.WhenAll(tasks).ConfigureAwait(false);
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            _notProcessingEvent.Set();
-                        }
-                    }
-                }
-            }, _shutdownTokenSource.Token);
+            _backgroundTask = StartBackgroundTaskAsync(maxBatchSize);
         }
 
         /// <inheritdoc/>
@@ -235,12 +183,6 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public void Dispose()
-        {
-            DisposeAsync().GetAwaiter().GetResult();
-        }
-
-        /// <inheritdoc/>
         public async Task DisposeAsync()
         {
             _shutdownTokenSource.Cancel();
@@ -251,6 +193,69 @@ namespace Namotion.Messaging
             catch (TaskCanceledException)
             {
             }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            DisposeAsync().GetAwaiter().GetResult();
+        }
+
+        private Task StartBackgroundTaskAsync(int maxBatchSize)
+        {
+            return Task.Run(async () =>
+            {
+                while (!_shutdownTokenSource.Token.IsCancellationRequested)
+                {
+                    await _processingTriggerEvent.WaitAsync(_shutdownTokenSource.Token);
+
+                    if (_consumers.Any())
+                    {
+                        _notProcessingEvent.Reset();
+                        try
+                        {
+                            while (!_shutdownTokenSource.Token.IsCancellationRequested)
+                            {
+                                var messages = new List<Message>();
+                                while (messages.Count < maxBatchSize && _queue.TryDequeue(out var msg))
+                                {
+                                    messages.Add(msg);
+                                }
+
+                                if (messages.Count != 0)
+                                {
+                                    var tasks = _consumers.Select(f => Task.Run(() =>
+                                    {
+                                        try
+                                        {
+                                            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(_shutdownTokenSource.Token, f.Value);
+                                            return f.Key(messages, cancellationSource.Token);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            if (!(e is TaskCanceledException))
+                                            {
+                                                _logger.LogError(e, "An error occurred in the in-memory message receiver.");
+                                            }
+
+                                            return Task.CompletedTask;
+                                        }
+                                    }));
+                                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            _notProcessingEvent.Set();
+                        }
+                    }
+                }
+            }, _shutdownTokenSource.Token);
         }
     }
 }
