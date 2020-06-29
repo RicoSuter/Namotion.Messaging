@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
+using Namotion.Messaging.Exceptions;
 
 namespace Namotion.Messaging.Azure.EventHub
 {
@@ -47,8 +48,8 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <param name="logger">The logger.</param>
         /// <returns>The message receiver.</returns>
         public static IMessageReceiver CreateFromEventProcessorHost(
-            EventProcessorHost eventProcessorHost, 
-            EventProcessorOptions processorOptions, 
+            EventProcessorHost eventProcessorHost,
+            EventProcessorOptions processorOptions,
             ILogger logger = null)
         {
             return new EventHubMessageReceiver(eventProcessorHost, processorOptions, logger);
@@ -88,6 +89,11 @@ namespace Namotion.Messaging.Azure.EventHub
                 var factory = new EventProcessorFactory(handleMessages, _host, _logger, cancellationToken);
                 await _host.RegisterEventProcessorFactoryAsync(factory, _processorOptions);
                 await Task.Delay(Timeout.Infinite, cancellationToken);
+            }
+            catch (TaskCanceledException) { throw; }
+            catch (Exception e)
+            {
+                throw new MessageReceivingFailedException("Registration of the message listener failed.", e);
             }
             finally
             {
@@ -233,13 +239,13 @@ namespace Namotion.Messaging.Azure.EventHub
                 {
                     _logger.LogInformation(error, "Receiver for partition has stopped receiving " +
                         "messages because another process has taken over the lease " +
-                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.", 
+                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.",
                         context.ConsumerGroupName, context.EventHubPath, context.PartitionId);
                 }
                 else
                 {
                     _logger.LogWarning(error, "Unable to process events " +
-                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.", 
+                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.",
                         context.ConsumerGroupName, context.EventHubPath, context.PartitionId);
                 }
 

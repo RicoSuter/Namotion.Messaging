@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Namotion.Messaging.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace Namotion.Messaging
         /// <summary>
         /// Sends a batch of messages to the queue.
         /// </summary>
+        /// <exception cref="MessagePublishingFailedException">Some messages could not be published.</exception>
         Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.EventHubs;
+using Namotion.Messaging.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,43 +49,51 @@ namespace Namotion.Messaging.Azure.EventHub
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
-            await Task.WhenAll(messages
-                .GroupBy(m => m.PartitionId)
-                .Select(messageGroup => Task.Run(async () =>
-                {
-                    var batch = _client.CreateBatch(new BatchOptions
+            try
+            {
+                await Task.WhenAll(messages
+                    .GroupBy(m => m.PartitionId)
+                    .Select(messageGroup => Task.Run(async () =>
                     {
-                        PartitionKey = messageGroup.Key,
-                        MaxMessageSize = _maxMessageSize
-                    });
-
-                    try
-                    {
-                        foreach (var message in messageGroup)
+                        var batch = _client.CreateBatch(new BatchOptions
                         {
-                            if (!batch.TryAdd(CreateEventData(message)))
+                            PartitionKey = messageGroup.Key,
+                            MaxMessageSize = _maxMessageSize
+                        });
+
+                        try
+                        {
+                            foreach (var message in messageGroup)
+                            {
+                                if (!batch.TryAdd(CreateEventData(message)))
+                                {
+                                    await _client.SendAsync(batch);
+
+                                    batch.Dispose();
+                                    batch = _client.CreateBatch(new BatchOptions
+                                    {
+                                        PartitionKey = messageGroup.Key,
+                                        MaxMessageSize = _maxMessageSize
+                                    });
+                                }
+                            }
+
+                            if (batch.Count > 0)
                             {
                                 await _client.SendAsync(batch);
-
-                                batch.Dispose();
-                                batch = _client.CreateBatch(new BatchOptions
-                                {
-                                    PartitionKey = messageGroup.Key,
-                                    MaxMessageSize = _maxMessageSize
-                                });
                             }
                         }
-
-                        if (batch.Count > 0)
+                        finally
                         {
-                            await _client.SendAsync(batch);
+                            batch.Dispose();
                         }
-                    }
-                    finally
-                    {
-                        batch.Dispose();
-                    }
-                }))).ConfigureAwait(false);
+                    }))).ConfigureAwait(false);
+            }
+            catch (TaskCanceledException) { throw; }
+            catch (Exception e)
+            {
+                throw new MessagePublishingFailedException(null, "Could not publish some of the messages.", e);
+            }
         }
 
         /// <inheritdoc/>
