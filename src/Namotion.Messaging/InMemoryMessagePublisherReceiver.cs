@@ -122,7 +122,6 @@ namespace Namotion.Messaging
         /// <summary>
         /// Gets the dead lettered messages.
         /// </summary>
-        // ReSharper disable once InconsistentlySynchronizedField
         public IEnumerable<Message> DeadLetterMessages
         {
             get
@@ -131,20 +130,6 @@ namespace Namotion.Messaging
                 {
                     return _deadLetterQueue.ToArray();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Purges all messages from the dead letter queue.
-        /// </summary>
-        /// <returns>The purged messages.</returns>
-        public IEnumerable<Message> PurgeDeadLetterQueue()
-        {
-            lock (_deadLetterQueue)
-            {
-                var messages = DeadLetterMessages;
-                _deadLetterQueue.Clear();
-                return messages;
             }
         }
 
@@ -161,10 +146,24 @@ namespace Namotion.Messaging
         }
 
         /// <summary>
-        /// Purges all internal structures.
+        /// Purges all messages from the dead letter queue.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A <see cref="Task">task</see> representing the asynchronous operation.</returns>
+        /// <returns>The purged messages.</returns>
+        public IEnumerable<Message> PurgeDeadLetterQueue()
+        {
+            lock (_deadLetterQueue)
+            {
+                var messages = DeadLetterMessages;
+                _deadLetterQueue.Clear();
+                return messages;
+            }
+        }
+
+        /// <summary>
+        /// Purges the message queue.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
         public async Task PurgeQueueAsync(CancellationToken cancellationToken = default)
         {
             _queue = new ConcurrentQueue<Message>();
@@ -174,8 +173,8 @@ namespace Namotion.Messaging
         /// <summary>
         /// Purges both message and dead-letter queues.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A <see cref="Task">task</see> representing the asynchronous operation.</returns>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task.</returns>
         public Task PurgeAsync(CancellationToken cancellationToken = default)
         {
             PurgeDeadLetterQueue();
