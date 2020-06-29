@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Namotion.Messaging.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace Namotion.Messaging
         /// <param name="handleMessages">The message handler callback.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task.</returns>
+        /// <exception cref="MessageReceivingFailedException">Listening for message failed.</exception>
         Task ListenAsync(
             Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
             CancellationToken cancellationToken = default);
