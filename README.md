@@ -103,6 +103,7 @@ Behavior extensions, for example custom dead letter queues or large message hand
 ### Namotion.Messaging.Abstractions
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Abstractions.svg)](https://www.nuget.org/packages/Namotion.Messaging.Abstractions/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Abstractions%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Abstractions/versions/latest?tab=types)
 
 Contains the messaging abstractions, mainly interfaces with a very small footprint and extremely stable contracts:
 
@@ -126,6 +127,7 @@ The idea behind the generic interfaces is to allow multiple instance registratio
 ### Namotion.Messaging
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.svg)](https://www.nuget.org/packages/Namotion.Messaging/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging/versions/latest?tab=types)
 
 Contains common helper methods and base implementations of the abstractions:
 
@@ -145,6 +147,7 @@ Other extension methods:
 ### Namotion.Messaging.Storage
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Storage.svg)](https://www.nuget.org/packages/Namotion.Messaging.Storage/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Storage%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Storage/versions/latest?tab=types)
 
 Extension methods to enhance or modify instances: 
 
@@ -157,6 +160,7 @@ Dependencies:
 ### Namotion.Messaging.Json
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Json.svg)](https://www.nuget.org/packages/Namotion.Messaging.Json/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Json%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Json/versions/latest?tab=types)
 
 Provides extension methods on `IMessagePublisher<T>` and `IMessageReceiver<T>` to enable JSON serialization for messages: 
 
@@ -215,6 +219,7 @@ The following packages should only be used in the head project, i.e. directly in
 ### Namotion.Messaging.Azure.ServiceBus
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.ServiceBus.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.ServiceBus/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Azure.ServiceBus%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Azure.ServiceBus/versions/latest?tab=types)
 
 Implementations: 
 
@@ -233,6 +238,7 @@ Dependencies:
 ### Namotion.Messaging.Azure.EventHub
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.EventHub.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.EventHub/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Azure.EventHub%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Azure.ServiceBus/versions/latest?tab=types)
 
 Implementations: 
 
@@ -252,6 +258,7 @@ Dependencies:
 ### Namotion.Messaging.Azure.Storage.Queue
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Azure.Storage.Queue.svg)](https://www.nuget.org/packages/Namotion.Messaging.Azure.Storage.Queue/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Azure.Storage.Queue%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Azure.Storage.Queue/versions/latest?tab=types)
 
 Implementations: 
 
@@ -269,6 +276,7 @@ Dependencies:
 ### Namotion.Messaging.RabbitMQ
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.RabbitMQ.svg)](https://www.nuget.org/packages/Namotion.Messaging.RabbitMQ/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.RabbitMQ%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.RabbitMQ/versions/latest?tab=types)
 
 Implementations: 
 
@@ -286,6 +294,7 @@ Dependencies:
 ### Namotion.Messaging.Amazon.SQS
 
 [![Nuget](https://img.shields.io/nuget/v/Namotion.Messaging.Amazon.SQS.svg)](https://www.nuget.org/packages/Namotion.Messaging.Amazon.SQS/)
+[![Apimundo](https://img.shields.io/badge/Namotion.Messaging.Amazon.SQS%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/Namotion.Messaging.Amazon.SQS/versions/latest?tab=types)
 
 Implementations: 
 
