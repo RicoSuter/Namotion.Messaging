@@ -30,6 +30,11 @@ namespace Namotion.Messaging
         private readonly ConcurrentDictionary<Func<IReadOnlyCollection<Message>, CancellationToken, Task>, CancellationToken> _consumers;
 
         /// <summary>
+        /// Gets or sets the current date time used to figure out when to deliver delayed messages when enqueue time is set.
+        /// </summary>
+        public DateTimeOffset CurrentDateTime { get; set; } = DateTimeOffset.UtcNow;
+
+        /// <summary>
         /// Creates a new in-memory message publisher and receiver which sends messages without blocking.
         /// </summary>
         /// <returns>The publisher and receiver.</returns>
@@ -218,7 +223,7 @@ namespace Namotion.Messaging
                                 var messages = new List<Message>();
                                 while (messages.Count < maxBatchSize && _queue.TryDequeue(out var msg))
                                 {
-                                    if (msg.EnqueueTime.HasValue && msg.EnqueueTime.Value < DateTimeOffset.UtcNow)
+                                    if (msg.EnqueueTime.HasValue && msg.EnqueueTime.Value > CurrentDateTime)
                                     {
                                         _queue.Enqueue(msg);
                                         await Task.Delay(100); // avoid high CPU during polling
