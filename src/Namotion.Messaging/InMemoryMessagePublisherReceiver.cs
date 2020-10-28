@@ -218,7 +218,15 @@ namespace Namotion.Messaging
                                 var messages = new List<Message>();
                                 while (messages.Count < maxBatchSize && _queue.TryDequeue(out var msg))
                                 {
-                                    messages.Add(msg);
+                                    if (msg.EnqueueTime.HasValue && msg.EnqueueTime.Value < DateTimeOffset.UtcNow)
+                                    {
+                                        _queue.Enqueue(msg);
+                                        await Task.Delay(100); // avoid high CPU during polling
+                                    }
+                                    else
+                                    {
+                                        messages.Add(msg);
+                                    }
                                 }
 
                                 if (messages.Count != 0)

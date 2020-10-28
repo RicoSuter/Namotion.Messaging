@@ -62,6 +62,11 @@ namespace Namotion.Messaging.Azure.ServiceBus
                 SessionId = abstractMessage.PartitionId
             };
 
+            if (abstractMessage.EnqueueTime.HasValue)
+            {
+                message.ScheduledEnqueueTimeUtc = abstractMessage.EnqueueTime.Value.ToUniversalTime().DateTime;
+            }
+
             foreach (var property in abstractMessage.Properties)
             {
                 message.UserProperties[property.Key] = property.Value;

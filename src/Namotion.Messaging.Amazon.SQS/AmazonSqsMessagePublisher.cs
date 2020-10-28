@@ -38,6 +38,13 @@ namespace Namotion.Messaging.Amazon.SQS
         /// <inheritdoc/>
         public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
+            _ = messages ?? throw new ArgumentNullException(nameof(messages));
+            if (messages.Any(m => m.EnqueueTime.HasValue))
+            {
+                // TODO: It might be possible to implement this with repeating DelaySeconds
+                throw new ArgumentException("The EnqueueTime property is not supported with Amazon SQS.");
+            }
+
             var batch = new SendMessageBatchRequest
             {
                 QueueUrl = await GetQueueUrl().ConfigureAwait(false),

@@ -48,6 +48,10 @@ namespace Namotion.Messaging.Azure.EventHub
         public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
+            if (messages.Any(m => m.EnqueueTime.HasValue))
+            {
+                throw new ArgumentException("The EnqueueTime property is not supported with Event Hubs.");
+            }
 
             try
             {
