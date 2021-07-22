@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.EventHubs;
-using Microsoft.Azure.EventHubs.Processor;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Namotion.Messaging.Exceptions;
+using Azure.Messaging.EventHubs;
+using Azure.Storage.Blobs;
+using Azure.Messaging.EventHubs.Processor;
 
 namespace Namotion.Messaging.Azure.EventHub
 {
@@ -16,47 +17,30 @@ namespace Namotion.Messaging.Azure.EventHub
     /// </summary>
     public class EventHubMessageReceiver : IMessageReceiver
     {
-        private readonly EventProcessorHost _host;
-        private readonly EventProcessorOptions _processorOptions;
+        private readonly EventProcessorClient _client;
         private readonly ILogger _logger;
 
-        private EventHubMessageReceiver(EventProcessorHost eventProcessorHost, EventProcessorOptions processorOptions, ILogger logger = null)
+        private EventHubMessageReceiver(EventProcessorClient eventProcessorClient, ILogger logger = null)
         {
-            _host = eventProcessorHost;
-            _processorOptions = processorOptions;
+            _client = eventProcessorClient;
             _logger = logger ?? NullLogger.Instance;
         }
 
         /// <summary>
-        /// Creates a new Event Hub message receiver from an <see cref="EventProcessorHost"/>.
+        /// Creates a new Event Hub message receiver from an <see cref="BlobContainerClient"/>.
         /// </summary>
-        /// <param name="eventProcessorHost">The event processor host.</param>
+        /// <param name="eventProcessorClient">The event processor client.</param>
         /// <param name="logger">The logger.</param>
         /// <returns>The message receiver.</returns>
         public static IMessageReceiver CreateFromEventProcessorHost(
-            EventProcessorHost eventProcessorHost,
+            EventProcessorClient eventProcessorClient,
             ILogger logger = null)
         {
-            return new EventHubMessageReceiver(eventProcessorHost, EventProcessorOptions.DefaultOptions, logger);
+            return new EventHubMessageReceiver(eventProcessorClient, logger);
         }
 
         /// <summary>
-        /// Creates a new Event Hub message receiver from an <see cref="EventProcessorHost"/>.
-        /// </summary>
-        /// <param name="eventProcessorHost">The event processor host.</param>
-        /// <param name="processorOptions">The processor options.</param>
-        /// <param name="logger">The logger.</param>
-        /// <returns>The message receiver.</returns>
-        public static IMessageReceiver CreateFromEventProcessorHost(
-            EventProcessorHost eventProcessorHost,
-            EventProcessorOptions processorOptions,
-            ILogger logger = null)
-        {
-            return new EventHubMessageReceiver(eventProcessorHost, processorOptions, logger);
-        }
-
-        /// <summary>
-        /// Creates a new Event Hub message receiver from an <see cref="EventProcessorHost"/>.
+        /// Creates a new Event Hub message receiver from an <see cref="BlobContainerClient"/>.
         /// </summary>
         /// <param name="eventHubPath">The event hub path.</param>
         /// <param name="consumerGroupName">The consumer group name.</param>
@@ -74,8 +58,7 @@ namespace Namotion.Messaging.Azure.EventHub
             ILogger logger = null)
         {
             return new EventHubMessageReceiver(
-                new EventProcessorHost(eventHubPath, consumerGroupName, eventHubConnectionString, storageConnectionString, leaseContainerName),
-                EventProcessorOptions.DefaultOptions,
+                new EventProcessorClient(new BlobContainerClient(storageConnectionString, leaseContainerName), consumerGroupName, eventHubConnectionString),
                 logger);
         }
 
@@ -84,10 +67,13 @@ namespace Namotion.Messaging.Azure.EventHub
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
 
+            var processor = new EventProcessor(handleMessages, _logger, cancellationToken);
             try
             {
-                var factory = new EventProcessorFactory(handleMessages, _host, _logger, cancellationToken);
-                await _host.RegisterEventProcessorFactoryAsync(factory, _processorOptions);
+                _client.ProcessEventAsync += processor.ProcessEventsAsync;
+                _client.ProcessErrorAsync += processor.ProcessErrorAsync;
+
+                await _client.StartProcessingAsync(cancellationToken);
                 await Task.Delay(Timeout.Infinite, cancellationToken);
             }
             catch (TaskCanceledException) { throw; }
@@ -97,7 +83,10 @@ namespace Namotion.Messaging.Azure.EventHub
             }
             finally
             {
-                await _host.UnregisterEventProcessorAsync();
+                await _client.StopProcessingAsync(cancellationToken);
+
+                _client.ProcessEventAsync -= processor.ProcessEventsAsync;
+                _client.ProcessErrorAsync -= processor.ProcessErrorAsync;
             }
         }
 
@@ -137,38 +126,12 @@ namespace Namotion.Messaging.Azure.EventHub
             return Task.CompletedTask;
         }
 
-        internal class EventProcessorFactory : IEventProcessorFactory
-        {
-            private readonly Func<IReadOnlyCollection<Message>, CancellationToken, Task> _handleMessages;
-            private readonly EventProcessorHost _host;
-            private readonly ILogger _logger;
-            private readonly CancellationToken _cancellationToken;
-
-            public EventProcessorFactory(
-                Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
-                EventProcessorHost host,
-                ILogger logger,
-                CancellationToken cancellationToken)
-            {
-                _handleMessages = handleMessages;
-                _host = host;
-                _logger = logger;
-                _cancellationToken = cancellationToken;
-            }
-
-            public IEventProcessor CreateEventProcessor(PartitionContext context)
-            {
-                return new EventProcessor(_handleMessages, _host, _logger, _cancellationToken);
-            }
-        }
-
-        internal class EventProcessor : IEventProcessor
+        internal class EventProcessor
         {
             private const string SequenceNumberProperty = "x-opt-sequence-number";
             private const string OffsetProperty = "x-opt-offset";
 
             private readonly Func<IReadOnlyCollection<Message>, CancellationToken, Task> _handleMessages;
-            private readonly EventProcessorHost _host;
             private readonly ILogger _logger;
             private readonly CancellationToken _cancellationToken;
 
@@ -176,86 +139,55 @@ namespace Namotion.Messaging.Azure.EventHub
 
             public EventProcessor(
                 Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages,
-                EventProcessorHost host,
                 ILogger logger,
                 CancellationToken cancellationToken)
             {
                 _handleMessages = handleMessages;
-                _host = host;
                 _logger = logger;
                 _cancellationToken = cancellationToken;
             }
 
-            public Task OpenAsync(PartitionContext context)
-            {
-                _logger.LogInformation("Started receiving on partition {PartitionId}.", context.PartitionId);
-
-                _scope = _logger.BeginScope(new Dictionary<string, object>
-                {
-                    { "EventHub.HostName", _host.HostName },
-                    { "EventHub.Path", context.EventHubPath },
-                    { "EventHub.ConsumerGroupName", context.ConsumerGroupName },
-                    { "EventHub.PartitionId", context.PartitionId },
-                });
-
-                return Task.CompletedTask;
-            }
-
-            public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
+            public async Task ProcessEventsAsync(ProcessEventArgs args)
             {
                 using (_logger.BeginScope(new Dictionary<string, object>
                 {
                     { "EventHub.Batch.Scope", Guid.NewGuid() },
-                    { "EventHub.Batch.MessageCount", messages.Count() },
-                    { "EventHub.Batch.StartSequenceNumber", messages.First().SystemProperties[SequenceNumberProperty] },
-                    { "EventHub.Batch.EndSequenceNumber", messages.Last().SystemProperties[SequenceNumberProperty] },
-                    { "EventHub.Batch.StartOffset", messages.First().SystemProperties[OffsetProperty] },
-                    { "EventHub.Batch.EndOffset", messages.Last().SystemProperties[OffsetProperty] },
+                    //{ "EventHub.Batch.MessageCount", messages.Count() },
+                    //{ "EventHub.Batch.StartSequenceNumber", messages.First().SystemProperties[SequenceNumberProperty] },
+                    //{ "EventHub.Batch.EndSequenceNumber", messages.Last().SystemProperties[SequenceNumberProperty] },
+                    //{ "EventHub.Batch.StartOffset", messages.First().SystemProperties[OffsetProperty] },
+                    //{ "EventHub.Batch.EndOffset", messages.Last().SystemProperties[OffsetProperty] },
                 }))
                 {
-                    try
+                    if (args.HasEvent)
                     {
-                        await _handleMessages(messages.Select(m => new Message(
-                            id: m.SystemProperties.PartitionKey + "-" + m.SystemProperties.SequenceNumber,
-                            content: m.Body.Array,
-                            partitionId: context.PartitionId,
-                            properties: m.Properties.ToDictionary(p => p.Key, p => p.Value),
-                            systemProperties: m.SystemProperties.ToDictionary(p => p.Key, p => p.Value))
-                        ).ToArray(), _cancellationToken);
-                    }
-                    catch (Exception exception)
-                    {
-                        _logger.LogError(exception, "An unexpected error occurred in the message handler.");
-                    }
+                        try
+                        {
+                            var messages = new[] { args.Data };
+                            await _handleMessages(messages.Select(m => new Message(
+                                id: m.PartitionKey + "-" + m.SequenceNumber,
+                                content: m.EventBody.ToArray(),
+                                partitionId: args.Partition.PartitionId,
+                                properties: m.Properties.ToDictionary(p => p.Key, p => p.Value),
+                                systemProperties: m.SystemProperties.ToDictionary(p => p.Key, p => p.Value))
+                            ).ToArray(), _cancellationToken);
+                        }
+                        catch (Exception exception)
+                        {
+                            _logger.LogError(exception, "An unexpected error occurred in the message handler.");
+                        }
 
-                    _cancellationToken.ThrowIfCancellationRequested();
-                    await context.CheckpointAsync().ConfigureAwait(false);
+                        _cancellationToken.ThrowIfCancellationRequested();
+                        await args.UpdateCheckpointAsync(_cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
 
-            public Task ProcessErrorAsync(PartitionContext context, Exception error)
+            public Task ProcessErrorAsync(ProcessErrorEventArgs args)
             {
-                if (error is ReceiverDisconnectedException)
-                {
-                    _logger.LogInformation(error, "Receiver for partition has stopped receiving " +
-                        "messages because another process has taken over the lease " +
-                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.",
-                        context.ConsumerGroupName, context.EventHubPath, context.PartitionId);
-                }
-                else
-                {
-                    _logger.LogWarning(error, "Unable to process events " +
-                        "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId}.",
-                        context.ConsumerGroupName, context.EventHubPath, context.PartitionId);
-                }
-
-                return Task.CompletedTask;
-            }
-
-            public Task CloseAsync(PartitionContext context, CloseReason reason)
-            {
-                _logger.LogInformation("Stopped receiving on partition {PartitionId}.", context.PartitionId);
-                _scope?.Dispose();
+                _logger.LogWarning(args.Exception, "Unable to process events " +
+                    "for consumer group {ConsumerGroupName} and path {EventHubPath} and partition {PartitionId} in operation {Operation}.",
+                    "n/a", "n/a", args.PartitionId, args.Operation);
 
                 return Task.CompletedTask;
             }

@@ -50,7 +50,7 @@ namespace Namotion.Messaging.Tests
                 .Select(i => CreateMessage(content))
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(120), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert
@@ -101,7 +101,7 @@ namespace Namotion.Messaging.Tests
                 .Select(i => new MyMessage { Id = orderId })
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(120), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert

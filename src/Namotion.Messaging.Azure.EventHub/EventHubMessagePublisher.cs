@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.EventHubs;
+﻿using Azure.Messaging.EventHubs;
+using Azure.Messaging.EventHubs.Producer;
 using Namotion.Messaging.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,10 @@ namespace Namotion.Messaging.Azure.EventHub
     /// </summary>
     public class EventHubMessagePublisher : IMessagePublisher
     {
-        private readonly EventHubClient _client;
+        private readonly EventHubProducerClient _client;
         private readonly long _maxMessageSize;
 
-        private EventHubMessagePublisher(EventHubClient client, long maxMessageSize)
+        private EventHubMessagePublisher(EventHubProducerClient client, long maxMessageSize)
         {
             _client = client;
             _maxMessageSize = maxMessageSize;
@@ -28,7 +29,7 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <param name="client">The client.</param>
         /// <param name="maxMessageSize">The maximum message size.</param>
         /// <returns>The message publisher.</returns>
-        public static IMessagePublisher CreateFromEventHubClient(EventHubClient client, long maxMessageSize = 262144)
+        public static IMessagePublisher CreateFromEventHubClient(EventHubProducerClient client, long maxMessageSize = 262144)
         {
             return new EventHubMessagePublisher(client, maxMessageSize);
         }
@@ -37,11 +38,12 @@ namespace Namotion.Messaging.Azure.EventHub
         /// Creates a new Event Hub publisher from a connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
+        /// <param name="eventHubName">The event hub name.</param>
         /// <param name="maxMessageSize">The maximum message size.</param>
         /// <returns>The message publisher.</returns>
-        public static IMessagePublisher Create(string connectionString, long maxMessageSize = 262144)
+        public static IMessagePublisher Create(string connectionString, string eventHubName, long maxMessageSize = 262144)
         {
-            return new EventHubMessagePublisher(EventHubClient.CreateFromConnectionString(connectionString), maxMessageSize);
+            return new EventHubMessagePublisher(new EventHubProducerClient(connectionString, eventHubName), maxMessageSize);
         }
 
         /// <inheritdoc/>
@@ -59,32 +61,33 @@ namespace Namotion.Messaging.Azure.EventHub
                     .GroupBy(m => m.PartitionId)
                     .Select(messageGroup => Task.Run(async () =>
                     {
-                        var batch = _client.CreateBatch(new BatchOptions
+                        var batchOptions = new CreateBatchOptions
                         {
                             PartitionKey = messageGroup.Key,
-                            MaxMessageSize = _maxMessageSize
-                        });
+                            MaximumSizeInBytes = _maxMessageSize
+                        };
 
+                        var batch = await _client.CreateBatchAsync(batchOptions, cancellationToken);
                         try
                         {
                             foreach (var message in messageGroup)
                             {
                                 if (!batch.TryAdd(CreateEventData(message)))
                                 {
-                                    await _client.SendAsync(batch);
+                                    await _client.SendAsync(batch, cancellationToken).ConfigureAwait(false);
 
                                     batch.Dispose();
-                                    batch = _client.CreateBatch(new BatchOptions
+                                    batch = await _client.CreateBatchAsync(new CreateBatchOptions
                                     {
                                         PartitionKey = messageGroup.Key,
-                                        MaxMessageSize = _maxMessageSize
+                                        MaximumSizeInBytes = _maxMessageSize
                                     });
                                 }
                             }
 
                             if (batch.Count > 0)
                             {
-                                await _client.SendAsync(batch);
+                                await _client.SendAsync(batch, cancellationToken).ConfigureAwait(false);
                             }
                         }
                         finally
@@ -103,7 +106,8 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <inheritdoc/>
         public void Dispose()
         {
-            _client.Close();
+            // TODO: Use DisposeAsync()?
+            _client.DisposeAsync().GetAwaiter().GetResult();
         }
 
         private static EventData CreateEventData(Message message)
