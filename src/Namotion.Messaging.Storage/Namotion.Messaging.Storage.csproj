@@ -14,7 +14,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Namotion.Storage.Abstractions" Version="0.1.0" />
+    <PackageReference Include="Namotion.Storage.Abstractions" Version="0.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj" />

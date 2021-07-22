@@ -14,7 +14,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.102.97" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.0.45" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Namotion.Messaging.Abstractions\Namotion.Messaging.Abstractions.csproj" />
