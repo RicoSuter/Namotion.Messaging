@@ -83,10 +83,15 @@ namespace Namotion.Messaging.Azure.EventHub
             }
             finally
             {
-                await _client.StopProcessingAsync(cancellationToken);
-
-                _client.ProcessEventAsync -= processor.ProcessEventsAsync;
-                _client.ProcessErrorAsync -= processor.ProcessErrorAsync;
+                try
+                {
+                    await _client.StopProcessingAsync(cancellationToken);
+                }
+                finally
+                {
+                    _client.ProcessEventAsync -= processor.ProcessEventsAsync;
+                    _client.ProcessErrorAsync -= processor.ProcessErrorAsync;
+                }
             }
         }
 
@@ -108,7 +113,7 @@ namespace Namotion.Messaging.Azure.EventHub
         public Task RejectAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             // There is no message rejection in Event Hubs
-            _logger.LogWarning("Message has been rejected which is not supported by Event Hub.");
+            _logger.LogWarning("Message rejection is not supported by Event Hub.");
             return Task.CompletedTask;
         }
 
