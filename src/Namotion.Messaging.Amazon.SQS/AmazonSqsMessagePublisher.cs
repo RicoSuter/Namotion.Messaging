@@ -68,12 +68,6 @@ namespace Namotion.Messaging.Amazon.SQS
             }
         }
 
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            _client.Dispose();
-        }
-
         private async Task<string> GetQueueUrl()
         {
             if (_queueUrl == null)
@@ -83,6 +77,19 @@ namespace Namotion.Messaging.Amazon.SQS
             }
 
             return _queueUrl;
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            _client.Dispose();
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+            Dispose();
         }
     }
 }

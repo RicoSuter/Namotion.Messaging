@@ -64,11 +64,6 @@ namespace Namotion.Messaging.Azure.Storage.Queue
             }
         }
 
-        /// <inheritdoc />
-        public void Dispose()
-        {
-        }
-
         private CloudQueueMessage ConvertToMessage(Message message)
         {
             if (!string.IsNullOrEmpty(message.Id))
@@ -81,6 +76,17 @@ namespace Namotion.Messaging.Azure.Storage.Queue
             {
                 return new CloudQueueMessage(message.Content);
             }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
         }
     }
 }

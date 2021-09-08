@@ -57,5 +57,17 @@ namespace Namotion.Messaging
         {
             return _messageReceiver.RejectAsync(messages, cancellationToken);
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            _messageReceiver.Dispose();
+        }
+
+        /// <inheritdoc/>
+        public ValueTask DisposeAsync()
+        {
+            return _messageReceiver.DisposeAsync();
+        }
     }
 }

@@ -103,13 +103,6 @@ namespace Namotion.Messaging.Azure.EventHub
             }
         }
 
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            // TODO: Use DisposeAsync()?
-            _client.DisposeAsync().GetAwaiter().GetResult();
-        }
-
         private static EventData CreateEventData(Message message)
         {
             var eventData = new EventData(message.Content);
@@ -120,6 +113,18 @@ namespace Namotion.Messaging.Azure.EventHub
             }
 
             return eventData;
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            DisposeAsync().GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public ValueTask DisposeAsync()
+        {
+            return _client.DisposeAsync();
         }
     }
 }

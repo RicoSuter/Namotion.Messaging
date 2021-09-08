@@ -158,5 +158,16 @@ namespace Namotion.Messaging.Azure.Storage.Queue
                     { NativeMessageProperty, message },
                 });
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+        }
     }
 }

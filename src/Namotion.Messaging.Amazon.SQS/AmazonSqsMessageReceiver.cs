@@ -173,5 +173,16 @@ namespace Namotion.Messaging.Amazon.SQS
                     { NativeMessageProperty, message },
                 });
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+        }
     }
 }

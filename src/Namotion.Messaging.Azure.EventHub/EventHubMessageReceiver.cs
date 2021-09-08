@@ -131,6 +131,17 @@ namespace Namotion.Messaging.Azure.EventHub
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+        }
+
         internal class EventProcessor
         {
             private const string SequenceNumberProperty = "x-opt-sequence-number";

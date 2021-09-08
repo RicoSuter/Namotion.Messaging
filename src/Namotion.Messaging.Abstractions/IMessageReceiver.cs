@@ -15,7 +15,7 @@ namespace Namotion.Messaging
     /// <summary>
     /// Receives messages from a message queue, broker or data ingestion system.
     /// </summary>
-    public interface IMessageReceiver
+    public interface IMessageReceiver : IDisposable, IAsyncDisposable
     {
         /// <summary>
         /// Gets the count of messages waiting to be processed.

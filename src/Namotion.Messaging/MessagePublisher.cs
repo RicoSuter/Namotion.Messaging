@@ -32,5 +32,11 @@ namespace Namotion.Messaging
         {
             _messagePublisher.Dispose();
         }
+
+        /// <inheritdoc/>
+        public ValueTask DisposeAsync()
+        {
+            return _messagePublisher.DisposeAsync();
+        }
     }
 }

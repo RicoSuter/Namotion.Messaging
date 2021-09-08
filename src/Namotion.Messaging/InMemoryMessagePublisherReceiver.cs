@@ -187,7 +187,7 @@ namespace Namotion.Messaging
         }
 
         /// <inheritdoc/>
-        public async Task DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
             _shutdownTokenSource.Cancel();
             try
