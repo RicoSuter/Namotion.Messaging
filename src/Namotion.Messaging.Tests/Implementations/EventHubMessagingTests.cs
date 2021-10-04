@@ -19,10 +19,8 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return EventHubMessageReceiver
-                .CreateFromEventProcessorHost(
-                    new EventProcessorClient(
-                        new BlobContainerClient(configuration["EventHubStorageConnectionString"], "myeventhub"),
-                        "$Default", configuration["EventHubConnectionString"]))
+                .Create("myeventhub", "$Default", configuration["EventHubConnectionString"], 
+                    configuration["EventHubStorageConnectionString"], "myeventhub")
                 .AsReceiver<MyMessage>();
         }
 

@@ -20,13 +20,15 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
         private readonly string _queueName;
         private readonly int _maxBatchSize;
+        private readonly bool _useSessions;
         private readonly bool _disposeClient;
 
-        private ServiceBusMessageReceiver(ServiceBusClient serviceBusClient, string queueName, int maxBatchSize, bool disposeClient = false)
+        private ServiceBusMessageReceiver(ServiceBusClient serviceBusClient, string queueName, int maxBatchSize, bool useSessions, bool disposeClient = false)
         {
             _client = serviceBusClient ?? throw new ArgumentNullException(nameof(serviceBusClient));
             _queueName = queueName;
             _maxBatchSize = maxBatchSize;
+            _useSessions = useSessions;
             _disposeClient = disposeClient;
         }
 
@@ -35,12 +37,13 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// </summary>
         /// <param name="serviceBusClient">The service bus client.</param>
         /// <param name="queueName">The queue name to listen on.</param>
-        /// <param name="maxMessageCount">The maximum message count (default: 1).</param>
-        /// <param name="disposeClient">Specifies whether to dispose the client when this receiver is disposed.</param>
+        /// <param name="maxBatchSize">The maximum batch size (default: 1).</param>
+        /// <param name="useSessions">Specifies whether to use session processing (default: false).</param>
+        /// <param name="disposeClient">Specifies whether to dispose the client when this receiver is disposed (default: false).</param>
         /// <returns>The message publisher.</returns>
-        public static IMessageReceiver CreateFromServiceBusClient(ServiceBusClient serviceBusClient, string queueName, int maxMessageCount = 1, bool disposeClient = false)
+        public static IMessageReceiver CreateFromServiceBusClient(ServiceBusClient serviceBusClient, string queueName, int maxBatchSize = 1, bool useSessions = false, bool disposeClient = false)
         {
-            return new ServiceBusMessageReceiver(serviceBusClient, queueName, maxMessageCount, disposeClient);
+            return new ServiceBusMessageReceiver(serviceBusClient, queueName, maxBatchSize, useSessions, disposeClient);
         }
 
         /// <summary>
@@ -49,12 +52,13 @@ namespace Namotion.Messaging.Azure.ServiceBus
         /// <param name="connectionString">The connection string.</param>
         /// <param name="queueName">The entity path.</param>
         /// <param name="maxBatchSize">The maximum batch size (default: 1).</param>
+        /// <param name="useSessions">Specifies whether to use session processing (default: false).</param>
         /// <returns>The message publisher.</returns>
         public static IMessageReceiver Create(
-            string connectionString, string queueName, int maxBatchSize = 1)
+            string connectionString, string queueName, int maxBatchSize = 1, bool useSessions = false)
         {
             var client = new ServiceBusClient(connectionString);
-            return new ServiceBusMessageReceiver(client, queueName, maxBatchSize, true);
+            return new ServiceBusMessageReceiver(client, queueName, maxBatchSize, useSessions, true);
         }
 
         /// <inheritdoc/>
@@ -67,9 +71,56 @@ namespace Namotion.Messaging.Azure.ServiceBus
                 throw new InvalidOperationException("Receiver is already listening.");
             }
 
+            if (_useSessions)
+            {
+                await ListenWithSessionsAsync(handleMessages, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                await ListenWithoutSessionsAsync(handleMessages, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        private async Task ListenWithSessionsAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    _receiver = await _client.AcceptNextSessionAsync(_queueName);
+
+                    var messages = await _receiver
+                        .ReceiveMessagesAsync(_maxBatchSize, TimeSpan.FromSeconds(30), cancellationToken)
+                        .ConfigureAwait(false);
+
+                    if (messages != null && messages.Any())
+                    {
+                        var abstractMessages = messages.Select(ConvertToMessage).ToArray();
+                        try
+                        {
+                            await handleMessages(abstractMessages, cancellationToken).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            await RejectAsync(abstractMessages, cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+
+                }
+                finally
+                {
+                    await _receiver.DisposeAsync().ConfigureAwait(false);
+                    _receiver = null;
+                }
+            }
+        }
+
+        private async Task ListenWithoutSessionsAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken)
+        {
             try
             {
                 _receiver = _client.CreateReceiver(_queueName);
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var messages = await _receiver
