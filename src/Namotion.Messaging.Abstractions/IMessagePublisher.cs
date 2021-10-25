@@ -15,7 +15,7 @@ namespace Namotion.Messaging
     /// <summary>
     /// Publishes messages to a message queue, broker or data ingestion system.
     /// </summary>
-    public interface IMessagePublisher : IDisposable
+    public interface IMessagePublisher : IDisposable, IAsyncDisposable
     {
         /// <summary>
         /// Sends a batch of messages to the queue.

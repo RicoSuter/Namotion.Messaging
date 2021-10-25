@@ -83,5 +83,12 @@ namespace Namotion.Messaging.RabbitMQ
             _channel?.Dispose();
             _connection?.Dispose();
         }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+            Dispose();
+        }
     }
 }

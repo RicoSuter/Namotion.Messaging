@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.EventHubs.Processor;
+using Azure.Messaging.EventHubs;
+using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using Namotion.Messaging.Azure.EventHub;
 using Xunit;
@@ -11,20 +12,15 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessagePublisher<MyMessage> CreateMessagePublisher(IConfiguration configuration)
         {
             return EventHubMessagePublisher
-                .Create(configuration["EventHubConnectionString"])
+                .Create(configuration["EventHubConnectionString"], "myeventhub")
                 .AsPublisher<MyMessage>();
         }
 
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return EventHubMessageReceiver
-                .CreateFromEventProcessorHost(
-                    new EventProcessorHost("myeventhub",
-                        "$Default",
-                        configuration["EventHubConnectionString"],
-                        configuration["EventHubStorageConnectionString"],
-                        "myeventhub"),
-                    new EventProcessorOptions { PrefetchCount = 500, MaxBatchSize = 100 })
+                .Create("myeventhub", "$Default", configuration["EventHubConnectionString"], 
+                    configuration["EventHubStorageConnectionString"], "myeventhub")
                 .AsReceiver<MyMessage>();
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.ServiceBus;
+using Azure.Messaging.ServiceBus;
 
 namespace Namotion.Messaging.Azure.ServiceBus
 {
@@ -12,32 +12,39 @@ namespace Namotion.Messaging.Azure.ServiceBus
     /// </summary>
     public class ServiceBusMessagePublisher : IMessagePublisher
     {
-        private readonly QueueClient _client;
+        private readonly ServiceBusClient _client;
+        private readonly ServiceBusSender _sender;
+        private readonly bool _disposeClient;
 
-        private ServiceBusMessagePublisher(QueueClient client)
+        private ServiceBusMessagePublisher(ServiceBusClient serviceBusClient, string queueName, bool disposeClient = false)
         {
-            _client = client;
+            _client = serviceBusClient ?? throw new ArgumentNullException(nameof(serviceBusClient));
+            _sender = _client.CreateSender(queueName);
+            _disposeClient = disposeClient;
         }
 
         /// <summary>
-        /// Creates a new Service Bus publisher from a queue client.
+        /// Creates a new Service Bus publisher from a client.
         /// </summary>
-        /// <param name="queueClient">The queue client.</param>
+        /// <param name="serviceBusClient">The service bus client.</param>
+        /// <param name="queueName">The queue or topic name.</param>
+        /// <param name="disposeClient">Specifies whether to dispose the client when this receiver is disposed.</param>
         /// <returns>The message publisher.</returns>
-        public static IMessagePublisher CreateFromQueueClient(QueueClient queueClient)
+        public static IMessagePublisher CreateFromServiceBusClient(ServiceBusClient serviceBusClient, string queueName, bool disposeClient = false)
         {
-            return new ServiceBusMessagePublisher(queueClient);
+            return new ServiceBusMessagePublisher(serviceBusClient, queueName, disposeClient);
         }
 
         /// <summary>
         /// Creates a new Service Bus publisher from a connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        /// <param name="entityPath">The entity path.</param>
+        /// <param name="queueName">The queue or topic name.</param>
         /// <returns>The message publisher.</returns>
-        public static IMessagePublisher Create(string connectionString, string entityPath)
+        public static IMessagePublisher Create(string connectionString, string queueName)
         {
-            return new ServiceBusMessagePublisher(new QueueClient(connectionString, entityPath));
+            var client = new ServiceBusClient(connectionString);
+            return new ServiceBusMessagePublisher(client, queueName, true);
         }
 
         /// <inheritdoc/>
@@ -45,18 +52,32 @@ namespace Namotion.Messaging.Azure.ServiceBus
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
-            await _client.SendAsync(messages.Select(m => CreateMessage(m)).ToList());
+            await _sender.SendMessagesAsync(messages.Select(m => CreateMessage(m)).ToList(), cancellationToken);
         }
 
         /// <inheritdoc/>
         public void Dispose()
         {
-            _client.CloseAsync().GetAwaiter().GetResult();
+            DisposeAsync().GetAwaiter().GetResult();
         }
 
-        private Microsoft.Azure.ServiceBus.Message CreateMessage(Message abstractMessage)
+        /// <inheritdoc/>
+        public async ValueTask DisposeAsync()
         {
-            var message = new Microsoft.Azure.ServiceBus.Message(abstractMessage.Content)
+            if (_sender != null)
+            {
+                await _sender.DisposeAsync();
+            }
+
+            if (_disposeClient && _client != null)
+            {
+                await _client.DisposeAsync();
+            }
+        }
+
+        private ServiceBusMessage CreateMessage(Message abstractMessage)
+        {
+            var message = new ServiceBusMessage(abstractMessage.Content)
             {
                 MessageId = abstractMessage.Id ?? Guid.NewGuid().ToString(),
                 SessionId = abstractMessage.PartitionId
@@ -64,12 +85,12 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
             if (abstractMessage.EnqueueTime.HasValue)
             {
-                message.ScheduledEnqueueTimeUtc = abstractMessage.EnqueueTime.Value.ToUniversalTime().DateTime;
+                message.ScheduledEnqueueTime = abstractMessage.EnqueueTime.Value.ToUniversalTime().DateTime;
             }
 
             foreach (var property in abstractMessage.Properties)
             {
-                message.UserProperties[property.Key] = property.Value;
+                message.ApplicationProperties[property.Key] = property.Value;
             }
 
             return message;
