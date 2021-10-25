@@ -72,7 +72,7 @@ namespace Namotion.Messaging.Azure.EventHub
             }
             finally
             {
-                await _client.StopProcessingAsync(cancellationToken);
+                await _client.StopProcessingAsync(); // no cancellation token to ensure it's stopped
             }
         }
 
