@@ -60,7 +60,7 @@ namespace Namotion.Messaging.Azure.EventHub
 
             try
             {
-                _client._handleMessages = handleMessages;
+                _client.HandleMessages = handleMessages;
              
                 await _client.StartProcessingAsync(cancellationToken);
                 await Task.Delay(Timeout.Infinite, cancellationToken);
@@ -128,8 +128,9 @@ namespace Namotion.Messaging.Azure.EventHub
             private const string SequenceNumberProperty = "x-opt-sequence-number";
             private const string OffsetProperty = "x-opt-offset";
 
-            public Func<IReadOnlyCollection<Message>, CancellationToken, Task> _handleMessages;
-            private Dictionary<string, ProcessEventArgs> _lastProcessEventArgs = new Dictionary<string, ProcessEventArgs>();
+            public Func<IReadOnlyCollection<Message>, CancellationToken, Task> HandleMessages { get; set; }
+
+            private readonly Dictionary<string, ProcessEventArgs> _lastProcessEventArgs = new Dictionary<string, ProcessEventArgs>();
             private readonly ILogger _logger;
 
             public InternalEventProcessorClient(
@@ -177,7 +178,7 @@ namespace Namotion.Messaging.Azure.EventHub
                 {
                     try
                     {
-                        await _handleMessages(messages.Select(m => new Message(
+                        await HandleMessages(messages.Select(m => new Message(
                             id: m.PartitionKey + "-" + m.SequenceNumber,
                             content: m.EventBody.ToArray(),
                             partitionId: partition.PartitionId,
