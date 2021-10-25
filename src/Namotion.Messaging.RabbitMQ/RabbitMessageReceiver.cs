@@ -134,5 +134,16 @@ namespace Namotion.Messaging.RabbitMQ
         {
             throw new NotSupportedException();
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+        }
     }
 }

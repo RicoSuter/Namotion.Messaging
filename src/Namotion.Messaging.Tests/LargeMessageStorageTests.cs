@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Namotion.Storage;
-using Namotion.Storage.Abstractions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;

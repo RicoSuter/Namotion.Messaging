@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
@@ -36,6 +37,10 @@ namespace Namotion.Messaging.RabbitMQ
         public Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
+            if (messages.Any(m => m.EnqueueTime.HasValue))
+            {
+                throw new ArgumentException("The EnqueueTime property is not supported with RabbitMQ.");
+            }
 
             if (_connection == null)
             {
@@ -77,6 +82,13 @@ namespace Namotion.Messaging.RabbitMQ
         {
             _channel?.Dispose();
             _connection?.Dispose();
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
+            Dispose();
         }
     }
 }

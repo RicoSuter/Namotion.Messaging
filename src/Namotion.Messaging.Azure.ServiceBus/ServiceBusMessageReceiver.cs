@@ -3,51 +3,62 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Core;
+using Azure.Messaging.ServiceBus;
 
 namespace Namotion.Messaging.Azure.ServiceBus
 {
     /// <summary>
     /// A Service Bus message receiver.
     /// </summary>
-    public class ServiceBusMessageReceiver : IMessageReceiver
+    public class ServiceBusMessageReceiver : IMessageReceiver, IAsyncDisposable
     {
         private const string LockTokenProperty = "LockToken";
         private const string DeliveryCountProperty = "DeliveryCount";
 
-        private MessageReceiver _messageReceiver;
-        private readonly int _maxBatchSize;
+        private ServiceBusClient _client;
+        private ServiceBusReceiver _receiver;
 
-        private ServiceBusMessageReceiver(MessageReceiver messageReceiver, int maxBatchSize)
+        private readonly string _queueName;
+        private readonly int _maxBatchSize;
+        private readonly bool _useSessions;
+        private readonly bool _disposeClient;
+
+        private ServiceBusMessageReceiver(ServiceBusClient serviceBusClient, string queueName, int maxBatchSize, bool useSessions, bool disposeClient = false)
         {
-            _messageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(MessageReceiver));
+            _client = serviceBusClient ?? throw new ArgumentNullException(nameof(serviceBusClient));
+            _queueName = queueName;
             _maxBatchSize = maxBatchSize;
+            _useSessions = useSessions;
+            _disposeClient = disposeClient;
         }
 
         /// <summary>
-        /// Creates a new Service Bus receiver from a message receiver.
+        /// Creates a new Service Bus receiver from a client.
         /// </summary>
-        /// <param name="messageReceiver">The message receiver.</param>
-        /// <param name="maxMessageCount">The maximum message count (default: 1).</param>
+        /// <param name="serviceBusClient">The service bus client.</param>
+        /// <param name="queueName">The queue name to listen on.</param>
+        /// <param name="maxBatchSize">The maximum batch size (default: 1).</param>
+        /// <param name="useSessions">Specifies whether to use session processing (default: false).</param>
+        /// <param name="disposeClient">Specifies whether to dispose the client when this receiver is disposed (default: false).</param>
         /// <returns>The message publisher.</returns>
-        public static IMessageReceiver CreateFromMessageReceiver(MessageReceiver messageReceiver, int maxMessageCount = 1)
+        public static IMessageReceiver CreateFromServiceBusClient(ServiceBusClient serviceBusClient, string queueName, int maxBatchSize = 1, bool useSessions = false, bool disposeClient = false)
         {
-            return new ServiceBusMessageReceiver(messageReceiver, maxMessageCount);
+            return new ServiceBusMessageReceiver(serviceBusClient, queueName, maxBatchSize, useSessions, disposeClient);
         }
 
         /// <summary>
         /// Creates a new Service Bus receiver from a connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        /// <param name="entityPath">The entity path.</param>
-        /// <param name="receiveMode">The receive mode (default: PeekLock).</param>
+        /// <param name="queueName">The entity path.</param>
         /// <param name="maxBatchSize">The maximum batch size (default: 1).</param>
+        /// <param name="useSessions">Specifies whether to use session processing (default: false).</param>
         /// <returns>The message publisher.</returns>
         public static IMessageReceiver Create(
-            string connectionString, string entityPath, ReceiveMode receiveMode = ReceiveMode.PeekLock, int maxBatchSize = 1)
+            string connectionString, string queueName, int maxBatchSize = 1, bool useSessions = false)
         {
-            return new ServiceBusMessageReceiver(new MessageReceiver(connectionString, entityPath, receiveMode), maxBatchSize);
+            var client = new ServiceBusClient(connectionString);
+            return new ServiceBusMessageReceiver(client, queueName, maxBatchSize, useSessions, true);
         }
 
         /// <inheritdoc/>
@@ -55,12 +66,65 @@ namespace Namotion.Messaging.Azure.ServiceBus
         {
             _ = handleMessages ?? throw new ArgumentNullException(nameof(handleMessages));
 
+            if (_receiver != null)
+            {
+                throw new InvalidOperationException("Receiver is already listening.");
+            }
+
+            if (_useSessions)
+            {
+                await ListenWithSessionsAsync(handleMessages, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                await ListenWithoutSessionsAsync(handleMessages, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        private async Task ListenWithSessionsAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    _receiver = await _client.AcceptNextSessionAsync(_queueName);
+
+                    var messages = await _receiver
+                        .ReceiveMessagesAsync(_maxBatchSize, TimeSpan.FromSeconds(30), cancellationToken)
+                        .ConfigureAwait(false);
+
+                    if (messages != null && messages.Any())
+                    {
+                        var abstractMessages = messages.Select(ConvertToMessage).ToArray();
+                        try
+                        {
+                            await handleMessages(abstractMessages, cancellationToken).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            await RejectAsync(abstractMessages, cancellationToken).ConfigureAwait(false);
+                        }
+                    }
+
+                }
+                finally
+                {
+                    await _receiver.DisposeAsync().ConfigureAwait(false);
+                    _receiver = null;
+                }
+            }
+        }
+
+        private async Task ListenWithoutSessionsAsync(Func<IReadOnlyCollection<Message>, CancellationToken, Task> handleMessages, CancellationToken cancellationToken)
+        {
             try
             {
+                _receiver = _client.CreateReceiver(_queueName);
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var messages = await _messageReceiver
-                        .ReceiveAsync(_maxBatchSize, TimeSpan.FromSeconds(30))
+                    var messages = await _receiver
+                        .ReceiveMessagesAsync(_maxBatchSize, TimeSpan.FromSeconds(30), cancellationToken)
                         .ConfigureAwait(false);
 
                     if (messages != null && messages.Any())
@@ -79,7 +143,8 @@ namespace Namotion.Messaging.Azure.ServiceBus
             }
             finally
             {
-                await _messageReceiver.CloseAsync().ConfigureAwait(false);
+                await _receiver.DisposeAsync().ConfigureAwait(false);
+                _receiver = null;
             }
         }
 
@@ -97,7 +162,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
             return Task.WhenAll(messages.Select(m =>
             {
-                return _messageReceiver.RenewLockAsync((string)m.SystemProperties[LockTokenProperty]);
+                return _receiver.RenewMessageLockAsync((ServiceBusReceivedMessage)m.SystemProperties[nameof(ServiceBusReceivedMessage)], cancellationToken);
             }));
         }
 
@@ -106,7 +171,10 @@ namespace Namotion.Messaging.Azure.ServiceBus
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
 
-            return _messageReceiver.CompleteAsync(messages.Select(m => (string)m.SystemProperties[LockTokenProperty]));
+            return Task.WhenAll(messages.Select(m =>
+            {
+                return _receiver.CompleteMessageAsync((ServiceBusReceivedMessage)m.SystemProperties[nameof(ServiceBusReceivedMessage)], cancellationToken);
+            }));
         }
 
         /// <inheritdoc/>
@@ -116,7 +184,7 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
             return Task.WhenAll(messages.Select(m =>
             {
-                return _messageReceiver.AbandonAsync((string)m.SystemProperties[LockTokenProperty]);
+                return _receiver.AbandonMessageAsync((ServiceBusReceivedMessage)m.SystemProperties[nameof(ServiceBusReceivedMessage)], null, cancellationToken);
             }));
         }
 
@@ -127,22 +195,38 @@ namespace Namotion.Messaging.Azure.ServiceBus
 
             return Task.WhenAll(messages.Select(m =>
             {
-                return _messageReceiver.DeadLetterAsync((string)m.SystemProperties[LockTokenProperty], reason, errorDescription);
+                return _receiver.DeadLetterMessageAsync((ServiceBusReceivedMessage)m.SystemProperties[nameof(ServiceBusReceivedMessage)], reason, errorDescription, cancellationToken);
             }));
         }
 
-        private Message ConvertToMessage(Microsoft.Azure.ServiceBus.Message message)
+        private Message ConvertToMessage(ServiceBusReceivedMessage message)
         {
             return new Message(
                 id: message.MessageId,
-                content: message.Body,
-                properties: message.UserProperties.ToDictionary(t => t.Key, t => t.Value),
+                content: message.Body.ToArray(),
+                properties: message.ApplicationProperties.ToDictionary(t => t.Key, t => t.Value),
                 partitionId: message.SessionId,
                 systemProperties: new Dictionary<string, object>
                 {
-                    { LockTokenProperty, message.SystemProperties.LockToken },
-                    { DeliveryCountProperty, message.SystemProperties.DeliveryCount },
+                    { LockTokenProperty, message.LockToken },
+                    { DeliveryCountProperty, message.DeliveryCount },
+                    { nameof(ServiceBusReceivedMessage), message },
                 });
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            DisposeAsync().GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async ValueTask DisposeAsync()
+        {
+            if (_disposeClient)
+            {
+                await _client.DisposeAsync().ConfigureAwait(false);
+            }
         }
     }
 }

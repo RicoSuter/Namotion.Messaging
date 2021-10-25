@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.EventHubs;
+﻿using Azure.Messaging.EventHubs;
+using Azure.Messaging.EventHubs.Producer;
+using Namotion.Messaging.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,10 @@ namespace Namotion.Messaging.Azure.EventHub
     /// </summary>
     public class EventHubMessagePublisher : IMessagePublisher
     {
-        private readonly EventHubClient _client;
+        private readonly EventHubProducerClient _client;
         private readonly long _maxMessageSize;
 
-        private EventHubMessagePublisher(EventHubClient client, long maxMessageSize)
+        private EventHubMessagePublisher(EventHubProducerClient client, long maxMessageSize)
         {
             _client = client;
             _maxMessageSize = maxMessageSize;
@@ -27,7 +29,7 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <param name="client">The client.</param>
         /// <param name="maxMessageSize">The maximum message size.</param>
         /// <returns>The message publisher.</returns>
-        public static IMessagePublisher CreateFromEventHubClient(EventHubClient client, long maxMessageSize = 262144)
+        public static IMessagePublisher CreateFromEventHubClient(EventHubProducerClient client, long maxMessageSize = 262144)
         {
             return new EventHubMessagePublisher(client, maxMessageSize);
         }
@@ -36,61 +38,69 @@ namespace Namotion.Messaging.Azure.EventHub
         /// Creates a new Event Hub publisher from a connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
+        /// <param name="eventHubName">The event hub name.</param>
         /// <param name="maxMessageSize">The maximum message size.</param>
         /// <returns>The message publisher.</returns>
-        public static IMessagePublisher Create(string connectionString, long maxMessageSize = 262144)
+        public static IMessagePublisher Create(string connectionString, string eventHubName, long maxMessageSize = 262144)
         {
-            return new EventHubMessagePublisher(EventHubClient.CreateFromConnectionString(connectionString), maxMessageSize);
+            return new EventHubMessagePublisher(new EventHubProducerClient(connectionString, eventHubName), maxMessageSize);
         }
 
         /// <inheritdoc/>
         public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
+            if (messages.Any(m => m.EnqueueTime.HasValue))
+            {
+                throw new ArgumentException("The EnqueueTime property is not supported with Event Hubs.");
+            }
 
-            await Task.WhenAll(messages
-                .GroupBy(m => m.PartitionId)
-                .Select(messageGroup => Task.Run(async () =>
-                {
-                    var batch = _client.CreateBatch(new BatchOptions
+            try
+            {
+                await Task.WhenAll(messages
+                    .GroupBy(m => m.PartitionId)
+                    .Select(messageGroup => Task.Run(async () =>
                     {
-                        PartitionKey = messageGroup.Key,
-                        MaxMessageSize = _maxMessageSize
-                    });
-
-                    try
-                    {
-                        foreach (var message in messageGroup)
+                        var batchOptions = new CreateBatchOptions
                         {
-                            if (!batch.TryAdd(CreateEventData(message)))
-                            {
-                                await _client.SendAsync(batch);
+                            PartitionKey = messageGroup.Key,
+                            MaximumSizeInBytes = _maxMessageSize
+                        };
 
-                                batch.Dispose();
-                                batch = _client.CreateBatch(new BatchOptions
+                        var batch = await _client.CreateBatchAsync(batchOptions, cancellationToken);
+                        try
+                        {
+                            foreach (var message in messageGroup)
+                            {
+                                if (!batch.TryAdd(CreateEventData(message)))
                                 {
-                                    PartitionKey = messageGroup.Key,
-                                    MaxMessageSize = _maxMessageSize
-                                });
+                                    await _client.SendAsync(batch, cancellationToken).ConfigureAwait(false);
+
+                                    batch.Dispose();
+                                    batch = await _client.CreateBatchAsync(new CreateBatchOptions
+                                    {
+                                        PartitionKey = messageGroup.Key,
+                                        MaximumSizeInBytes = _maxMessageSize
+                                    });
+                                }
+                            }
+
+                            if (batch.Count > 0)
+                            {
+                                await _client.SendAsync(batch, cancellationToken).ConfigureAwait(false);
                             }
                         }
-
-                        if (batch.Count > 0)
+                        finally
                         {
-                            await _client.SendAsync(batch);
+                            batch.Dispose();
                         }
-                    }
-                    finally
-                    {
-                        batch.Dispose();
-                    }
-                }))).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            _client.Close();
+                    }))).ConfigureAwait(false);
+            }
+            catch (TaskCanceledException) { throw; }
+            catch (Exception e)
+            {
+                throw new MessagePublishingFailedException(null, "Could not publish some of the messages.", e);
+            }
         }
 
         private static EventData CreateEventData(Message message)
@@ -103,6 +113,18 @@ namespace Namotion.Messaging.Azure.EventHub
             }
 
             return eventData;
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            DisposeAsync().GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public ValueTask DisposeAsync()
+        {
+            return _client.DisposeAsync();
         }
     }
 }

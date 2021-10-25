@@ -20,8 +20,8 @@ namespace Namotion.Messaging.Tests
             int count = GetMessageCount();
             var content = Guid.NewGuid().ToByteArray();
 
-            var publisher = CreateMessagePublisher(config);
-            var receiver = CreateMessageReceiver(config);
+            using var publisher = CreateMessagePublisher(config);
+            using var receiver = CreateMessageReceiver(config);
 
             // Act
             var messages = new List<Message>();
@@ -50,7 +50,7 @@ namespace Namotion.Messaging.Tests
                 .Select(i => CreateMessage(content))
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(120), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert
@@ -72,8 +72,8 @@ namespace Namotion.Messaging.Tests
             int count = GetMessageCount();
             var orderId = Guid.NewGuid().ToString();
 
-            var publisher = CreateMessagePublisher(config);
-            var receiver = CreateMessageReceiver(config);
+            using var publisher = CreateMessagePublisher(config);
+            using var receiver = CreateMessageReceiver(config);
 
             // Act
             var messages = new List<Message<MyMessage>>();
@@ -101,7 +101,7 @@ namespace Namotion.Messaging.Tests
                 .Select(i => new MyMessage { Id = orderId })
                 .ToList());
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30), receiveCancellation.Token));
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(120), receiveCancellation.Token));
             listenCancellation.Cancel();
 
             // Assert

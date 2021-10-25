@@ -3,6 +3,7 @@ using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Queue;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,17 +52,16 @@ namespace Namotion.Messaging.Azure.Storage.Queue
         public async Task PublishAsync(IEnumerable<Message> messages, CancellationToken cancellationToken = default)
         {
             _ = messages ?? throw new ArgumentNullException(nameof(messages));
+            if (messages.Any(m => m.EnqueueTime.HasValue))
+            {
+                throw new ArgumentException("The EnqueueTime property is not supported with Azure Storage Queue.");
+            }
 
             foreach (var message in messages)
             {
                 var nativeMessage = ConvertToMessage(message);
                 await _queue.AddMessageAsync(nativeMessage);
             }
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
         }
 
         private CloudQueueMessage ConvertToMessage(Message message)
@@ -76,6 +76,17 @@ namespace Namotion.Messaging.Azure.Storage.Queue
             {
                 return new CloudQueueMessage(message.Content);
             }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable CS1998
+        public async ValueTask DisposeAsync()
+        {
         }
     }
 }

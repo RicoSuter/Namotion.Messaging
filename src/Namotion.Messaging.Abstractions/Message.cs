@@ -17,14 +17,16 @@ namespace Namotion.Messaging
         /// <param name="properties">The message user properties.</param>
         /// <param name="systemProperties">The message system properties.</param>
         /// <param name="partitionId">The partition ID.</param>
+        /// <param name="enqueueTime">The enqueue time to delay the message delivery.</param>
         public Message(
             string id = null,
             byte[] content = null,
             T deserializedObject = default,
             IReadOnlyDictionary<string, object> properties = null,
             IReadOnlyDictionary<string, object> systemProperties = null,
-            string partitionId = null)
-            : base(id, content, properties, systemProperties, partitionId)
+            string partitionId = null,
+            DateTimeOffset? enqueueTime = null)
+            : base(id, content, properties, systemProperties, partitionId, enqueueTime)
         {
             Object = deserializedObject;
         }
@@ -96,18 +98,21 @@ namespace Namotion.Messaging
         /// <param name="properties">The message user properties.</param>
         /// <param name="systemProperties">The message system properties.</param>
         /// <param name="partitionId">The partition ID.</param>
+        /// <param name="enqueueTime">The enqueue time to delay the message delivery.</param>
         public Message(
             string id = null,
             byte[] content = null,
             IReadOnlyDictionary<string, object> properties = null,
             IReadOnlyDictionary<string, object> systemProperties = null,
-            string partitionId = null)
+            string partitionId = null,
+            DateTimeOffset? enqueueTime = null)
         {
             Id = id;
             Content = content ?? new byte[0];
             Properties = properties ?? new Dictionary<string, object>();
             SystemProperties = systemProperties ?? new Dictionary<string, object>();
             PartitionId = partitionId;
+            EnqueueTime = enqueueTime;
         }
 
         /// <summary>
@@ -134,6 +139,11 @@ namespace Namotion.Messaging
         /// Gets the internal properties for this message.
         /// </summary>
         public IReadOnlyDictionary<string, object> SystemProperties { get; }
+
+        /// <summary>
+        /// Gets the enqueue time to delay the message delivery (not supported by all implementations).
+        /// </summary>
+        public DateTimeOffset? EnqueueTime { get; }
 
         /// <summary>
         /// Clones the message.
