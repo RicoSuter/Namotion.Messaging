@@ -30,17 +30,17 @@ namespace Namotion.Messaging.Azure.EventHub
         /// <summary>
         /// Creates a new Event Hub message receiver from an <see cref="BlobContainerClient"/>.
         /// </summary>
-        /// <param name="eventHubName">The event hub name.</param>
         /// <param name="consumerGroupName">The consumer group name.</param>
         /// <param name="eventHubConnectionString">The event hub connection string.</param>
+        /// <param name="eventHubName">The event hub name.</param>
         /// <param name="storageConnectionString">The stoarge connection string.</param>
         /// <param name="leaseContainerName">The lease container name.</param>
         /// <param name="logger">The logger.</param>
         /// <returns>The message receiver.</returns>
         public static IMessageReceiver Create(
-            string eventHubName,
             string consumerGroupName,
             string eventHubConnectionString,
+            string eventHubName,
             string storageConnectionString,
             string leaseContainerName,
             ILogger logger = null)

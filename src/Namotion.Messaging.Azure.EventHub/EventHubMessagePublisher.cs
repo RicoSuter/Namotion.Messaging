@@ -38,6 +38,17 @@ namespace Namotion.Messaging.Azure.EventHub
         /// Creates a new Event Hub publisher from a connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
+        /// <param name="maxMessageSize">The maximum message size.</param>
+        /// <returns>The message publisher.</returns>
+        public static IMessagePublisher Create(string connectionString, long maxMessageSize = 262144)
+        {
+            return new EventHubMessagePublisher(new EventHubProducerClient(connectionString), maxMessageSize);
+        }
+
+        /// <summary>
+        /// Creates a new Event Hub publisher from a connection string.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
         /// <param name="eventHubName">The event hub name.</param>
         /// <param name="maxMessageSize">The maximum message size.</param>
         /// <returns>The message publisher.</returns>

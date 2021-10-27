@@ -19,7 +19,7 @@ namespace Namotion.Messaging.Tests.Implementations
         protected override IMessageReceiver<MyMessage> CreateMessageReceiver(IConfiguration configuration)
         {
             return EventHubMessageReceiver
-                .Create("myeventhub", "$Default", configuration["EventHubConnectionString"], 
+                .Create("$Default", configuration["EventHubConnectionString"], "myeventhub",
                     configuration["EventHubStorageConnectionString"], "myeventhub")
                 .AsReceiver<MyMessage>();
         }
